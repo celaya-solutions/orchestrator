@@ -303,6 +303,21 @@ sequenceDiagram
   API-->>Client: status {state, artifacts, error?}
 ```
 
+### Business-friendly flow
+
+```mermaid
+flowchart LR
+  A[You upload a task<br/>and classification] --> B[Server preflight checks<br/>pay, on-call, human signals]
+  B -->|safe| C[Orchestrator runs AI<br/>with your prompt]
+  B -->|blocked| X[400 illegal_state<br/>+ reason]
+  C --> D[AI drafts outputs<br/>and iterates safely]
+  D --> E[Scan for forbidden phrases<br/>unpaid, volunteer, etc.]
+  E -->|clean| F[Package results<br/>+ compliance_manifest.json]
+  E -->|violation| Y[Delete artifacts<br/>mark run failed]
+  F --> G[Poll /runs/{id}<br/>for status & files]
+  Y --> G
+```
+
 ### API endpoints
 
 - `GET /healthz` — liveness probe, returns `{"status":"ok"}`.
