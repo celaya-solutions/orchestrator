@@ -54,6 +54,13 @@ class AgentType(Enum):
     ACP = "acp"
     AUTO = "auto"
 
+class RunType(str, Enum):
+    """Classification for how a run is executed."""
+
+    AI_ONLY = "ai_only"
+    W2_EMPLOYEE = "w2_employee"
+    CONTRACTOR_1099 = "contractor_1099"
+
 class ConfigValidator:
     """Validates Ralph configuration settings.
 
