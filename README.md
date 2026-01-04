@@ -28,6 +28,7 @@ Based on the Ralph Wiggum technique by [Geoffrey Huntley](https://ghuntley.com/r
 - 📚 **Prompt Archiving**: Tracks prompt evolution over iterations
 - 🔄 **Error Recovery**: Automatic retry with exponential backoff (non-blocking)
 - 📊 **State Persistence**: Saves metrics and state for analysis
+- 📈 **Telemetry Dashboard**: Local-first SQLite logging with built-in admin views for GPT Actions
 - ⏱️ **Configurable Limits**: Set max iterations and runtime limits
 - 🧪 **Comprehensive Testing**: 620+ tests with unit, integration, and async coverage
 - 🎨 **Rich Terminal Output**: Beautiful formatted output with syntax highlighting
@@ -246,6 +247,15 @@ Advanced Options:
   ```bash
   curl -H "x-api-key: <secret>" http://localhost:8081/openapi.json -o customgpt-actions-openapi.json
   ```
+
+## Actions Telemetry & Admin Dashboard
+
+- **Safe defaults:** Telemetry skips request/response bodies and only records sizes plus a small allowlisted metadata dict. Ephemeral user IDs from ChatGPT are hashed with `ADMIN_TELEMETRY_SALT` (required for hashing).
+- **Admin protection:** Every `/admin` and `/admin/api` route requires `x-admin-key: $ADMIN_API_KEY` (or `x-api-key` with the same value). Requests are rejected if `ADMIN_API_KEY` is unset.
+- **Local-first storage:** SQLite at `TELEMETRY_DB_PATH` (default `./data/telemetry.db`, retention `TELEMETRY_RETENTION_DAYS=30`, toggle with `TELEMETRY_ENABLED`). A rollup worker summarizes daily stats while keeping write overhead low via a background queue.
+- **Dashboards:** `GET /admin` for KPIs, `/admin/actions`, `/admin/sessions`, `/admin/runs`, `/admin/events`. Time filters: `?range=24h|7d|30d` or `?start=YYYY-MM-DD&end=...`.
+- **Exports/APIs:** `/admin/api/summary`, `/admin/api/actions`, `/admin/api/sessions`; exports via `/admin/export/events.ndjson`, `/admin/export/events.csv`, `/admin/export/actions.csv`.
+- **Deploy on Fly.io:** Mount a volume and set `TELEMETRY_DB_PATH` inside that mount (e.g., `/data/telemetry.db`) to persist analytics across restarts.
 
 ## Architecture (mermaid)
 

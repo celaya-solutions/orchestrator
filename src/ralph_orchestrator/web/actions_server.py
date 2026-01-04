@@ -7,6 +7,8 @@ import asyncio
 import json
 import logging
 import os
+import time
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -24,7 +26,7 @@ from fastapi import (
 )
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.security.api_key import APIKeyHeader
 from pydantic import BaseModel, Field, field_validator
 
@@ -39,6 +41,8 @@ from ..main import (
     RunType,
 )
 from ..orchestrator import RalphOrchestrator
+from ..telemetry.core import TelemetryService
+from .admin_dashboard import build_admin_router
 
 logger = logging.getLogger(__name__)
 
@@ -240,6 +244,63 @@ def _normalize_terms(values: List[str]) -> List[str]:
     return normalized
 
 
+def _int_from_header(value: Optional[str]) -> Optional[int]:
+    """Safely parse an integer header like content-length."""
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _route_template(request: Request) -> str:
+    """Best-effort extraction of the route template."""
+    route = request.scope.get("route")
+    if route and getattr(route, "path", None):
+        return route.path
+    return request.url.path
+
+
+def _action_name_from_request(request: Request) -> str:
+    """Prefer endpoint name over raw path for action naming."""
+    endpoint = request.scope.get("endpoint")
+    if endpoint and getattr(endpoint, "__name__", None):
+        return endpoint.__name__
+    route = request.scope.get("route")
+    if route and getattr(route, "name", None):
+        return route.name
+    return request.url.path
+
+
+def _response_size(response: Optional[Response]) -> Optional[int]:
+    """Return response size in bytes when known."""
+    if response is None:
+        return None
+    header_size = _int_from_header(response.headers.get("content-length"))
+    if header_size is not None:
+        return header_size
+    body = getattr(response, "body", None)
+    if body:
+        return len(body)
+    return None
+
+
+def _allowlisted_meta(request: Request) -> Dict[str, Any]:
+    """Build a safe metadata payload."""
+    meta: Dict[str, Any] = {}
+    client = request.headers.get("x-client") or request.headers.get("client")
+    if client:
+        meta["client"] = client[:60]
+    model_hint = request.headers.get("x-model-hint")
+    if model_hint:
+        meta["model_hint"] = model_hint[:80]
+    state_meta = getattr(request.state, "telemetry_meta", None)
+    if isinstance(state_meta, dict):
+        for key in ("orchestrator_status", "version"):
+            if key in state_meta:
+                meta[key] = state_meta[key]
+    return meta
+
+
 def validate_run_inputs(request: ActionRunRequest) -> None:
     """Preflight validator to enforce classification safety before orchestration starts."""
     classification = request.classification
@@ -282,9 +343,10 @@ def illegal_state(reason: str) -> Dict[str, str]:
 class ActionRunManager:
     """Coordinates orchestration runs for the actions API."""
 
-    def __init__(self):
+    def __init__(self, telemetry: Optional[TelemetryService] = None):
         self.runs: Dict[str, ActionRunState] = {}
         self._lock = asyncio.Lock()
+        self.telemetry = telemetry
 
     async def start_run(self, request: ActionRunRequest) -> ActionRunState:
         """Start a new orchestrator run in the background."""
@@ -424,6 +486,33 @@ class ActionRunManager:
             state.generated_artifacts.append(manifest_str)
         return manifest_path
 
+    def _log_run_completion(self, state: ActionRunState) -> None:
+        """Emit a telemetry event when a run completes."""
+        if not self.telemetry or not self.telemetry.enabled:
+            return
+        duration_ms = 0
+        if state.completed_at:
+            duration_ms = int((state.completed_at - state.started_at).total_seconds() * 1000)
+        meta: Dict[str, Any] = {
+            "final_status": state.state,
+            "duration_ms": duration_ms,
+        }
+        if state.error:
+            meta["error"] = state.error[:120]
+        try:
+            self.telemetry.log_event(
+                route="run_complete",
+                method="internal",
+                action_name="run_complete",
+                status_code=200 if state.state == "completed" else 500,
+                ok=state.state == "completed",
+                latency_ms=duration_ms,
+                run_id=state.run_id,
+                meta=meta,
+            )
+        except Exception as exc:  # pragma: no cover - defensive logging
+            logger.debug("Failed to record run completion telemetry: %s", exc)
+
     def _fail_run(self, state: ActionRunState, reason: str, purge_artifacts: bool = False) -> None:
         """Mark a run as failed with an optional cleanup step."""
         state.state = "failed"
@@ -472,6 +561,7 @@ class ActionRunManager:
             self._record_metrics_artifact(state)
         finally:
             state.completed_at = datetime.now(timezone.utc)
+            self._log_run_completion(state)
 
     async def cancel_run(self, run_id: str) -> ActionRunState:
         """Request cancellation of a running orchestrator."""
@@ -513,6 +603,7 @@ class ActionRunManager:
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 ACTION_API_KEY = os.getenv("RALPH_ACTIONS_API_KEY")
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
 
 async def require_api_key(api_key: Optional[str] = Security(api_key_header)) -> None:
@@ -526,11 +617,23 @@ async def require_api_key(api_key: Optional[str] = Security(api_key_header)) -> 
 
 def create_app() -> FastAPI:
     """Construct the FastAPI application."""
+    telemetry_service = TelemetryService()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        telemetry_service.start()
+        try:
+            yield
+        finally:
+            telemetry_service.stop()
+
     app = FastAPI(
         title="Ralph CustomGPT Actions",
         description="Lightweight API surface for integrating Ralph with GPT Actions.",
         version="0.1.0",
+        lifespan=lifespan,
     )
+    app.state.telemetry = telemetry_service
 
     @app.exception_handler(RequestValidationError)
     async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -553,7 +656,54 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    manager = ActionRunManager()
+    @app.middleware("http")
+    async def telemetry_middleware(request: Request, call_next):
+        telemetry = getattr(app.state, "telemetry", None)
+        if not telemetry or not telemetry.enabled:
+            return await call_next(request)
+
+        start_time = time.perf_counter()
+        req_bytes = _int_from_header(request.headers.get("content-length"))
+        session_id = request.headers.get("openai-conversation-id")
+        user_hash = telemetry.hash_user(request.headers.get("openai-ephemeral-user-id"))
+        response: Optional[Response] = None
+        error_type: Optional[str] = None
+        error_message: Optional[str] = None
+        status_code: int = 500
+
+        try:
+            response = await call_next(request)
+            status_code = response.status_code
+            return response
+        except Exception as exc:
+            status_code = getattr(exc, "status_code", 500)
+            error_type = exc.__class__.__name__
+            error_message = str(exc)
+            raise
+        finally:
+            latency_ms = int((time.perf_counter() - start_time) * 1000)
+            route_template = _route_template(request)
+            action_name = _action_name_from_request(request)
+            run_id = getattr(request.state, "telemetry_run_id", None) or request.path_params.get("run_id")
+            resp_bytes = _response_size(response)
+            telemetry.log_event(
+                route=route_template,
+                method=request.method,
+                action_name=action_name,
+                status_code=status_code,
+                ok=status_code < 400,
+                latency_ms=latency_ms,
+                run_id=run_id,
+                session_id=session_id,
+                user_hash=user_hash,
+                req_bytes=req_bytes,
+                resp_bytes=resp_bytes,
+                error_type=error_type,
+                error_message=error_message,
+                meta=_allowlisted_meta(request),
+            )
+
+    manager = ActionRunManager(telemetry=telemetry_service)
     # Expose manager for tests/ops without changing core orchestration
     app.state.actions_manager = manager
 
@@ -584,6 +734,7 @@ def create_app() -> FastAPI:
             ) from exc
 
         status_url = str(request.url_for("get_action_run", run_id=state.run_id))
+        request.state.telemetry_run_id = state.run_id
         return ActionStartResponse(run_id=state.run_id, status_url=status_url)
 
     @app.get(
@@ -625,6 +776,8 @@ def create_app() -> FastAPI:
         """List all tracked runs (newest first)."""
         runs = await manager.list_runs()
         return ActionListResponse(runs=[state.to_status() for state in runs])
+
+    app.include_router(build_admin_router(telemetry_service, ADMIN_API_KEY))
 
     return app
 
