@@ -99,6 +99,9 @@ class CostTracker:
         self.total_cost = 0.0
         self.costs_by_tool: Dict[str, float] = {}
         self.usage_history: List[Dict] = []
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
+        self.tokens_by_tool: Dict[str, Dict[str, int]] = {}
     
     def add_usage(
         self,
@@ -111,7 +114,7 @@ class CostTracker:
         Args:
             tool: Name of the AI tool
             input_tokens: Number of input tokens
-            output_tokens: Number of output tokens
+        output_tokens: Number of output tokens
             
         Returns:
             Cost for this usage
@@ -123,6 +126,14 @@ class CostTracker:
         input_cost = (input_tokens / 1000) * costs["input"]
         output_cost = (output_tokens / 1000) * costs["output"]
         total = input_cost + output_cost
+
+        # Track token counts
+        self.total_input_tokens += input_tokens
+        self.total_output_tokens += output_tokens
+        if tool not in self.tokens_by_tool:
+            self.tokens_by_tool[tool] = {"input": 0, "output": 0}
+        self.tokens_by_tool[tool]["input"] += input_tokens
+        self.tokens_by_tool[tool]["output"] += output_tokens
         
         # Update tracking
         self.total_cost += total

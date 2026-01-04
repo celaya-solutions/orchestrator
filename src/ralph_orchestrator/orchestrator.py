@@ -684,6 +684,19 @@ class RalphOrchestrator:
             self.console.print_info("Cost breakdown:")
             for tool, cost in self.cost_tracker.costs_by_tool.items():
                 self.console.print_info(f"  {tool}: ${cost:.4f}")
+            # Token summary
+            total_in = self.cost_tracker.total_input_tokens
+            total_out = self.cost_tracker.total_output_tokens
+            if total_in or total_out:
+                self.console.print_info(
+                    f"Token usage - input: {total_in:,}, output: {total_out:,}"
+                )
+                if self.cost_tracker.tokens_by_tool:
+                    self.console.print_info("Token breakdown:")
+                    for tool, tok in self.cost_tracker.tokens_by_tool.items():
+                        self.console.print_info(
+                            f"  {tool}: in {tok.get('input', 0):,}, out {tok.get('output', 0):,}"
+                        )
 
         # Save metrics to file with enhanced per-iteration telemetry
         metrics_dir = Path(".agent") / "metrics"
@@ -707,6 +720,11 @@ class RalphOrchestrator:
             "cost": {
                 "total": self.cost_tracker.total_cost if self.cost_tracker else 0,
                 "by_tool": self.cost_tracker.costs_by_tool if self.cost_tracker else {},
+                "tokens": {
+                    "input": self.cost_tracker.total_input_tokens if self.cost_tracker else 0,
+                    "output": self.cost_tracker.total_output_tokens if self.cost_tracker else 0,
+                    "by_tool": self.cost_tracker.tokens_by_tool if self.cost_tracker else {},
+                },
                 "history": self.cost_tracker.usage_history if self.cost_tracker else [],
             },
             # Analysis metrics (if telemetry enabled)
