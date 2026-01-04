@@ -2982,9 +2982,9 @@
 <pre class="mermaid"><code>graph TB
     A[Prompt File] --&gt; B[Ralph Orchestrator]
     B --&gt; C{AI Agent}
-    C --&gt; D[Claude]
-    C --&gt; E[Q Chat]
-    C --&gt; F[Gemini]
+    C --&gt; D[Ollama]
+    C --&gt; E[Gemini]
+    C --&gt; F[Claude]
     D --&gt; G[Execute Task]
     E --&gt; G
     F --&gt; G
@@ -3181,9 +3181,9 @@ These results demonstrate that with clear prompts and patience, Ralph can replac
     end
 
     subgraph "AI Agents"
-        H[Claude]
-        I[Q Chat]
-        J[Gemini]
+        H[Ollama]
+        I[Gemini]
+        J[Claude]
     end
 
     subgraph "Persistence"

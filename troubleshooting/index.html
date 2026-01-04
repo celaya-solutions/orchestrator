@@ -2919,7 +2919,7 @@
 </ol>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>which<span class="w"> </span>claude
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>which<span class="w"> </span>gemini
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>which<span class="w"> </span>q
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>which<span class="w"> </span>ollama
 </span></code></pre></div>
 <ol>
 <li>Install missing agent:</li>
@@ -3204,7 +3204,7 @@
 </li>
 </ol>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># Q is typically faster</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>ralph<span class="w"> </span>run<span class="w"> </span>--agent<span class="w"> </span>q
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>ralph<span class="w"> </span>run<span class="w"> </span>--agent<span class="w"> </span>ollama
 </span></code></pre></div>
 <h4 id="high-memory-usage">High Memory Usage<a class="headerlink" href="#high-memory-usage" title="Permanent link">&para;</a></h4>
 <p><strong>Problem</strong>: Ralph consuming excessive memory</p>
@@ -3315,10 +3315,10 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>&quot;Model not available&quot;
 </span></code></pre></div>
 <p><strong>Solution</strong>: Check Gemini CLI version and update</p>
-<h4 id="q-chat-errors">Q Chat Errors<a class="headerlink" href="#q-chat-errors" title="Permanent link">&para;</a></h4>
+<h4 id="ollama-errors">Ollama Errors<a class="headerlink" href="#ollama-errors" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>&quot;Connection refused&quot;
 </span></code></pre></div>
-<p><strong>Solution</strong>: Ensure Q service is running</p>
+<p><strong>Solution</strong>: Ensure the Ollama service is running (e.g., restart <code>ollama serve</code> or the desktop app)</p>
 <h2 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h2>
 <h3 id="enable-verbose-logging">Enable Verbose Logging<a class="headerlink" href="#enable-verbose-logging" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># Maximum verbosity</span>
@@ -3390,7 +3390,7 @@
 </span><span id="__span-51-5"><a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="s">echo &quot;Agents available:&quot;</span>
 </span><span id="__span-51-6"><a id="__codelineno-51-6" name="__codelineno-51-6" href="#__codelineno-51-6"></a><span class="s">which claude &amp;&amp; echo &quot;  ✓ Claude&quot; || echo &quot;  ✗ Claude&quot;</span>
 </span><span id="__span-51-7"><a id="__codelineno-51-7" name="__codelineno-51-7" href="#__codelineno-51-7"></a><span class="s">which gemini &amp;&amp; echo &quot;  ✓ Gemini&quot; || echo &quot;  ✗ Gemini&quot;</span>
-</span><span id="__span-51-8"><a id="__codelineno-51-8" name="__codelineno-51-8" href="#__codelineno-51-8"></a><span class="s">which q &amp;&amp; echo &quot;  ✓ Q&quot; || echo &quot;  ✗ Q&quot;</span>
+</span><span id="__span-51-8"><a id="__codelineno-51-8" name="__codelineno-51-8" href="#__codelineno-51-8"></a><span class="s">which ollama &amp;&amp; echo &quot;  ✓ Ollama&quot; || echo &quot;  ✗ Ollama&quot;</span>
 </span><span id="__span-51-9"><a id="__codelineno-51-9" name="__codelineno-51-9" href="#__codelineno-51-9"></a><span class="s">echo &quot;&quot;</span>
 </span><span id="__span-51-10"><a id="__codelineno-51-10" name="__codelineno-51-10" href="#__codelineno-51-10"></a><span class="s">echo &quot;Git status:&quot;</span>
 </span><span id="__span-51-11"><a id="__codelineno-51-11" name="__codelineno-51-11" href="#__codelineno-51-11"></a><span class="s">git status --short</span>

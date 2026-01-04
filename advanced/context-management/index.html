@@ -1637,10 +1637,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#q-chat-8k-context" class="md-nav__link">
+  <a href="#ollama-model-dependent-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Q Chat (8K context)
+        Ollama (model-dependent context)
       
     </span>
   </a>
@@ -3021,10 +3021,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#q-chat-8k-context" class="md-nav__link">
+  <a href="#ollama-model-dependent-context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Q Chat (8K context)
+        Ollama (model-dependent context)
       
     </span>
   </a>
@@ -3102,6 +3102,12 @@
 </thead>
 <tbody>
 <tr>
+<td>Ollama</td>
+<td>Model-dependent</td>
+<td>Model-dependent</td>
+<td>Varies</td>
+</tr>
+<tr>
 <td>Claude</td>
 <td>200K tokens</td>
 <td>200,000</td>
@@ -3112,12 +3118,6 @@
 <td>32K tokens</td>
 <td>32,768</td>
 <td>~130,000 chars</td>
-</tr>
-<tr>
-<td>Q Chat</td>
-<td>8K tokens</td>
-<td>8,192</td>
-<td>~32,000 chars</td>
 </tr>
 </tbody>
 </table>
@@ -3154,7 +3154,7 @@
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="s1">&#39;percentage_used&#39;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="s1">&#39;claude&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">estimated_tokens</span> <span class="o">/</span> <span class="mi">200000</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>            <span class="s1">&#39;gemini&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">estimated_tokens</span> <span class="o">/</span> <span class="mi">32768</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>            <span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">estimated_tokens</span> <span class="o">/</span> <span class="mi">8192</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>            <span class="s1">&#39;ollama&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">estimated_tokens</span> <span class="o">/</span> <span class="mi">8192</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>        <span class="p">}</span>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="p">}</span>
 </span></code></pre></div>
@@ -3481,11 +3481,11 @@
 <li>Good for medium-sized projects</li>
 <li>Optimize file inclusion</li>
 </ul>
-<h3 id="q-chat-8k-context">Q Chat (8K context)<a class="headerlink" href="#q-chat-8k-context" title="Permanent link">&para;</a></h3>
+<h3 id="ollama-model-dependent-context">Ollama (model-dependent context)<a class="headerlink" href="#ollama-model-dependent-context" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Minimize context aggressively</li>
-<li>Focus on single files/functions</li>
-<li>Use for targeted tasks</li>
+<li>Keep prompts concise for smaller local models</li>
+<li>Focus on a single file or task per iteration</li>
+<li>Ensure required models are pulled and cached locally</li>
 </ul>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span>

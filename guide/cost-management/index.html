@@ -3380,16 +3380,16 @@
 </thead>
 <tbody>
 <tr>
+<td><strong>Ollama</strong></td>
+<td>$0.00</td>
+<td>$0.00</td>
+<td>Local/free</td>
+</tr>
+<tr>
 <td><strong>Claude</strong></td>
 <td>$3.00</td>
 <td>$15.00</td>
 <td>$5-50</td>
-</tr>
-<tr>
-<td><strong>Q Chat</strong></td>
-<td>$0.50</td>
-<td>$1.50</td>
-<td>$1-10</td>
 </tr>
 <tr>
 <td><strong>Gemini</strong></td>
@@ -3406,7 +3406,7 @@
 <p><strong>Example:</strong>
 - Task uses 100K input tokens, 50K output tokens
 - With Claude: (0.1 × $3) + (0.05 × $15) = $1.05
-- With Q Chat: (0.1 × $0.50) + (0.05 × $1.50) = $0.125</p>
+- With Ollama: Local execution (no incremental token cost)</p>
 <h2 id="cost-control-mechanisms">Cost Control Mechanisms<a class="headerlink" href="#cost-control-mechanisms" title="Permanent link">&para;</a></h2>
 <h3 id="1-hard-limits">1. Hard Limits<a class="headerlink" href="#1-hard-limits" title="Permanent link">&para;</a></h3>
 <p>Set maximum spending caps:</p>
@@ -3426,7 +3426,7 @@
 <h3 id="3-agent-selection">3. Agent Selection<a class="headerlink" href="#3-agent-selection" title="Permanent link">&para;</a></h3>
 <p>Choose cost-effective agents:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Development: Use cheaper agents</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>q<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">5</span>.0
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>ollama<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">0</span>.0
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Production: Use quality agents with limits</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>claude<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">50</span>.0
@@ -3434,17 +3434,17 @@
 <h2 id="optimization-strategies">Optimization Strategies<a class="headerlink" href="#optimization-strategies" title="Permanent link">&para;</a></h2>
 <h3 id="1-tiered-agent-strategy">1. Tiered Agent Strategy<a class="headerlink" href="#1-tiered-agent-strategy" title="Permanent link">&para;</a></h3>
 <p>Use different agents for different task phases:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Phase 1: Research with Q (cheap)</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Phase 1: Research with Ollama (local/free)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Research the problem&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>research.md
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>q<span class="w"> </span>--prompt<span class="w"> </span>research.md<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">2</span>.0
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>ollama<span class="w"> </span>--prompt<span class="w"> </span>research.md<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">0</span>.0
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="c1"># Phase 2: Implementation with Claude (quality)</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Implement the solution&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>implement.md
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>claude<span class="w"> </span>--prompt<span class="w"> </span>implement.md<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">20</span>.0
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Phase 3: Testing with Q (cheap)</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1"># Phase 3: Testing with Ollama (local/free)</span>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Test the solution&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>test.md
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>q<span class="w"> </span>--prompt<span class="w"> </span>test.md<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">2</span>.0
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span>--agent<span class="w"> </span>ollama<span class="w"> </span>--prompt<span class="w"> </span>test.md<span class="w"> </span>--max-cost<span class="w"> </span><span class="m">0</span>.0
 </span></code></pre></div>
 <h3 id="2-prompt-optimization">2. Prompt Optimization<a class="headerlink" href="#2-prompt-optimization" title="Permanent link">&para;</a></h3>
 <p>Reduce token usage through efficient prompts:</p>
@@ -3551,8 +3551,8 @@
 <tr>
 <td>Simple Script</td>
 <td>Low</td>
-<td>$0.50 - $2</td>
-<td>Q Chat</td>
+<td>Local</td>
+<td>Ollama</td>
 </tr>
 <tr>
 <td>Web API</td>
@@ -3575,8 +3575,8 @@
 <tr>
 <td>Documentation</td>
 <td>Low-Medium</td>
-<td>$2 - $10</td>
-<td>Q/Claude</td>
+<td>$0 - $10</td>
+<td>Ollama/Claude</td>
 </tr>
 <tr>
 <td>Debugging</td>
@@ -3599,9 +3599,9 @@
 <h3 id="minimal-cost-profile">Minimal Cost Profile<a class="headerlink" href="#minimal-cost-profile" title="Permanent link">&para;</a></h3>
 <p>Maximum savings, acceptable quality:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>python<span class="w"> </span>ralph_orchestrator.py<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--agent<span class="w"> </span>q<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>--agent<span class="w"> </span>ollama<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span>--max-tokens<span class="w"> </span><span class="m">50000</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--max-cost<span class="w"> </span><span class="m">2</span>.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span>--max-cost<span class="w"> </span><span class="m">0</span>.0<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span>--context-window<span class="w"> </span><span class="m">30000</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span>--context-threshold<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span>--checkpoint-interval<span class="w"> </span><span class="m">10</span>
@@ -3635,7 +3635,7 @@
 </span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="k">elif</span> <span class="n">remaining_budget</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
 </span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">agent</span> <span class="o">=</span> <span class="s2">&quot;gemini&quot;</span>
 </span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="k">else</span><span class="p">:</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="n">agent</span> <span class="o">=</span> <span class="s2">&quot;q&quot;</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="n">agent</span> <span class="o">=</span> <span class="s2">&quot;ollama&quot;</span>
 </span></code></pre></div>
 <h3 id="cost-aware-prompts">Cost-Aware Prompts<a class="headerlink" href="#cost-aware-prompts" title="Permanent link">&para;</a></h3>
 <p>Include cost considerations in prompts:</p>

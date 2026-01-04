@@ -3101,9 +3101,10 @@
 <h3 id="2-agent-abstraction-layer">2. Agent Abstraction Layer<a class="headerlink" href="#2-agent-abstraction-layer" title="Permanent link">&para;</a></h3>
 <p>Ralph supports multiple AI agents through a unified interface:</p>
 <ul>
-<li><strong>Claude</strong> (Anthropic Claude Code CLI)</li>
-<li><strong>Q Chat</strong> (Q CLI tool) </li>
+<li><strong>Ollama</strong> (local CLI, default)</li>
 <li><strong>Gemini</strong> (Google Gemini CLI)</li>
+<li><strong>Claude</strong> (Anthropic Claude Code CLI)</li>
+<li><strong>ACP</strong> (Agent Client Protocol adapter for compatible agents)</li>
 </ul>
 <p>Each agent is executed through subprocess calls with consistent error handling and output capture.</p>
 <h3 id="3-state-management">3. State Management<a class="headerlink" href="#3-state-management" title="Permanent link">&para;</a></h3>
