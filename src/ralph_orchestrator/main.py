@@ -12,8 +12,6 @@ from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 from enum import Enum
 
-from .orchestrator import RalphOrchestrator
-
 
 # Configuration defaults
 DEFAULT_MAX_ITERATIONS = 100
@@ -585,6 +583,8 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
     
     # Create config
+    from .orchestrator import RalphOrchestrator
+
     config = RalphConfig(
         agent=AgentType(args.agent),
         prompt_file=args.prompt,

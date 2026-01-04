@@ -1,4 +1,5 @@
 import asyncio
+import json
 import sys
 import time
 from pathlib import Path
@@ -72,7 +73,10 @@ def test_run_lifecycle(client, tmp_path, monkeypatch):
 
     monkeypatch.setattr(actions_server.RalphOrchestrator, "arun", quick_run)
 
-    resp = client.post("/runs", json={"prompt_file": str(prompt_file)})
+    resp = client.post(
+        "/runs",
+        json={"prompt_file": str(prompt_file), "classification": "ai_only"},
+    )
     assert resp.status_code == 200
     run_id = resp.json()["run_id"]
 
@@ -88,6 +92,7 @@ def test_run_lifecycle(client, tmp_path, monkeypatch):
     assert status["state"] == "completed"
     assert status["progress"]["iterations"] == 1
     assert status["prompt_file"] == str(prompt_file)
+    assert status["run_type"] == "ai_only"
 
 
 def test_cancel_run(client, tmp_path, monkeypatch):
@@ -101,7 +106,10 @@ def test_cancel_run(client, tmp_path, monkeypatch):
 
     monkeypatch.setattr(actions_server.RalphOrchestrator, "arun", blocking_run)
 
-    resp = client.post("/runs", json={"prompt_file": str(prompt_file)})
+    resp = client.post(
+        "/runs",
+        json={"prompt_file": str(prompt_file), "classification": "ai_only"},
+    )
     run_id = resp.json()["run_id"]
 
     cancel_resp = client.delete(f"/runs/{run_id}")
@@ -113,3 +121,175 @@ def test_cancel_run(client, tmp_path, monkeypatch):
 
     assert status["state"] == "cancelled"
     assert status["error"] in (None, "Cancelled by user")
+
+
+def test_missing_classification_returns_400(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("missing classification")
+
+    resp = client.post("/runs", json={"prompt_file": str(prompt_file)})
+    assert resp.status_code == 400
+    body = resp.json()
+    assert body["error"] == "illegal_state"
+    assert "classification" in body["reason"]
+
+
+def test_w2_missing_pay_rejected(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("w2 check")
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "w2_employee",
+            "pay_type": "hourly",
+        },
+    )
+    assert resp.status_code == 400
+    body = resp.json()
+    assert body["error"] == "illegal_state"
+    assert "requires pay" in body["reason"]
+
+
+def test_invalid_pay_type_rejected(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("bad pay type")
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "w2_employee",
+            "pay": 100,
+            "pay_type": "stipend",
+        },
+    )
+    assert resp.status_code == 400
+    body = resp.json()
+    assert body["reason"] == "pay_type must be hourly or salary for w2_employee classification"
+
+
+def test_forbidden_compensation_rejected(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("forbidden comp")
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "contractor_1099",
+            "pay": 100,
+            "compensation": ["token compensation"],
+        },
+    )
+    assert resp.status_code == 400
+    body = resp.json()
+    assert body["reason"] == "non-monetary compensation for human labor"
+
+
+def test_on_call_requires_ai_only(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("on call schedule")
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "w2_employee",
+            "pay": 100,
+            "pay_type": "hourly",
+            "schedule": "Participates in on call rotation",
+        },
+    )
+    assert resp.status_code == 400
+    body = resp.json()
+    assert "on-call" in body["reason"]
+
+
+def test_human_indicators_block_ai_only(client, tmp_path):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("ai only")
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "ai_only",
+            "human_indicators": ["resume"],
+        },
+    )
+    assert resp.status_code == 400
+    body = resp.json()
+    assert body["error"] == "illegal_state"
+    assert "human indicators" in body["reason"]
+
+
+def test_forbidden_output_blocks_run(client, tmp_path, monkeypatch):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("run with forbidden output")
+
+    async def forbidden_run(self):
+        self.metrics.iterations += 1
+        self.last_response_output = "This expects unpaid volunteer work"
+
+    monkeypatch.setattr(actions_server.RalphOrchestrator, "arun", forbidden_run)
+
+    resp = client.post(
+        "/runs",
+        json={"prompt_file": str(prompt_file), "classification": "ai_only"},
+    )
+    run_id = resp.json()["run_id"]
+
+    status = None
+    for _ in range(10):
+        status_resp = client.get(f"/runs/{run_id}")
+        status = status_resp.json()
+        if status["state"] in {"completed", "failed", "cancelled"}:
+            break
+        time.sleep(0.01)
+
+    assert status is not None
+    assert status["state"] == "failed"
+    assert "Forbidden output phrase detected" in status["error"]
+    manifest_path = prompt_file.parent / "compliance_manifest.json"
+    assert not manifest_path.exists()
+
+
+def test_compliance_manifest_created(client, tmp_path, monkeypatch):
+    prompt_file = tmp_path / "PROMPT.md"
+    prompt_file.write_text("w2 run")
+
+    async def quick_run(self):
+        self.metrics.iterations += 1
+        self.last_response_output = "All requirements satisfied."
+
+    monkeypatch.setattr(actions_server.RalphOrchestrator, "arun", quick_run)
+
+    resp = client.post(
+        "/runs",
+        json={
+            "prompt_file": str(prompt_file),
+            "classification": "w2_employee",
+            "pay": 120000,
+            "pay_type": "salary",
+        },
+    )
+    run_id = resp.json()["run_id"]
+
+    status = None
+    for _ in range(10):
+        status_resp = client.get(f"/runs/{run_id}")
+        status = status_resp.json()
+        if status["state"] in {"completed", "failed", "cancelled"}:
+            break
+        time.sleep(0.01)
+
+    manifest_path = prompt_file.parent / "compliance_manifest.json"
+    assert manifest_path.exists()
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["classification"] == "w2_employee"
+    assert manifest["monetary_compensation_confirmed"] is True
+    assert manifest["human_labor"] is True
+    assert status is not None
+    assert str(manifest_path) in status["artifacts"]

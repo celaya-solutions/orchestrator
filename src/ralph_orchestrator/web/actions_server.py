@@ -188,51 +188,6 @@ class ActionRunState:
     completed_at: Optional[datetime] = None
     error: Optional[str] = None
 
-
-def _normalize_terms(values: List[str]) -> List[str]:
-    """Normalize string values for comparison."""
-    normalized: List[str] = []
-    for value in values:
-        text = str(value).strip().lower()
-        if text:
-            normalized.append(text)
-    return normalized
-
-
-def validate_run_inputs(request: ActionRunRequest) -> None:
-    """Preflight validator to enforce classification safety before orchestration starts."""
-    classification = request.classification
-    if classification is None:
-        raise RunValidationError("classification is required")
-
-    pay_type = request.pay_type.lower() if isinstance(request.pay_type, str) else request.pay_type
-    comp_terms = set(_normalize_terms(request.compensation))
-    schedule_text = (request.schedule or "").lower()
-    human_indicators = request.human_indicators or []
-
-    if classification == RunType.W2_EMPLOYEE and request.pay is None:
-        raise RunValidationError("w2_employee classification requires pay")
-
-    if classification == RunType.W2_EMPLOYEE and pay_type not in {"hourly", "salary"}:
-        raise RunValidationError("pay_type must be hourly or salary for w2_employee classification")
-
-    if classification == RunType.CONTRACTOR_1099 and request.pay is None:
-        raise RunValidationError("contractor_1099 classification requires pay")
-
-    if any(term in comp_terms for term in FORBIDDEN_COMPENSATION_TERMS):
-        raise RunValidationError("non-monetary compensation for human labor")
-
-    if "on call" in schedule_text and classification != RunType.AI_ONLY:
-        raise RunValidationError("on-call scheduling is only allowed for ai_only classification")
-
-    if human_indicators and classification == RunType.AI_ONLY:
-        raise RunValidationError("human indicators provided for ai_only classification")
-
-
-def illegal_state(reason: str) -> Dict[str, str]:
-    """Consistent error envelope for illegal run requests."""
-    return {"error": ILLEGAL_STATE_ERROR, "reason": reason}
-
     def to_status(self) -> ActionRunStatus:
         """Project internal state into a response model."""
         progress: Dict[str, Any] = {}
@@ -273,6 +228,55 @@ def illegal_state(reason: str) -> Dict[str, str]:
             error=self.error,
             metadata=self.request.metadata,
         )
+
+
+def _normalize_terms(values: List[str]) -> List[str]:
+    """Normalize string values for comparison."""
+    normalized: List[str] = []
+    for value in values:
+        text = str(value).strip().lower()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
+def validate_run_inputs(request: ActionRunRequest) -> None:
+    """Preflight validator to enforce classification safety before orchestration starts."""
+    classification = request.classification
+    if classification is None:
+        raise RunValidationError("classification is required")
+
+    pay_type = request.pay_type.lower() if isinstance(request.pay_type, str) else request.pay_type
+    comp_terms = _normalize_terms(request.compensation)
+    schedule_text = (request.schedule or "").lower()
+    human_indicators = request.human_indicators or []
+
+    if classification == RunType.W2_EMPLOYEE and request.pay is None:
+        raise RunValidationError("w2_employee classification requires pay")
+
+    if classification == RunType.W2_EMPLOYEE and pay_type not in {"hourly", "salary"}:
+        raise RunValidationError("pay_type must be hourly or salary for w2_employee classification")
+
+    if classification == RunType.CONTRACTOR_1099 and request.pay is None:
+        raise RunValidationError("contractor_1099 classification requires pay")
+
+    if any(
+        forbidden in entry
+        for entry in comp_terms
+        for forbidden in FORBIDDEN_COMPENSATION_TERMS
+    ):
+        raise RunValidationError("non-monetary compensation for human labor")
+
+    if "on call" in schedule_text and classification != RunType.AI_ONLY:
+        raise RunValidationError("on-call scheduling is only allowed for ai_only classification")
+
+    if human_indicators and classification == RunType.AI_ONLY:
+        raise RunValidationError("human indicators provided for ai_only classification")
+
+
+def illegal_state(reason: str) -> Dict[str, str]:
+    """Consistent error envelope for illegal run requests."""
+    return {"error": ILLEGAL_STATE_ERROR, "reason": reason}
 
 
 class ActionRunManager:
@@ -465,7 +469,7 @@ class ActionRunManager:
             logger.error("Run %s failed: %s", run_id, exc)
             state.state = "failed"
             state.error = str(exc)
-            self._purge_generated_artifacts(state)
+            self._record_metrics_artifact(state)
         finally:
             state.completed_at = datetime.now(timezone.utc)
 
