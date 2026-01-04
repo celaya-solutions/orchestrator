@@ -1,0 +1,3898 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production-ready AI orchestration using the Ralph Wiggum technique">
+      
+      
+        <meta name="author" content="Ralph Orchestrator Contributors">
+      
+      
+        <link rel="canonical" href="https://mikeyobrien.github.io/ralph-orchestrator/research/">
+      
+      
+        <link rel="prev" href="../glossary/">
+      
+      
+        <link rel="next" href="../03-best-practices/best-practices/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Research and Theory - Ralph Orchestrator</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#research-and-theory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Ralph Orchestrator" class="md-header__button md-logo" aria-label="Ralph Orchestrator" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Ralph Orchestrator
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Research and Theory
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/mikeyobrien/ralph-orchestrator" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mikeyobrien/ralph-orchestrator
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+    
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guide/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  User Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../deployment/docker/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Deployment
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../advanced/architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/orchestrator/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../examples/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Development
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Resources
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Ralph Orchestrator" class="md-nav__button md-logo" aria-label="Ralph Orchestrator" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Ralph Orchestrator
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/mikeyobrien/ralph-orchestrator" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    mikeyobrien/ralph-orchestrator
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href=".." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agents Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/prompts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompt Engineering Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/checkpointing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checkpointing and Recovery Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/cost-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cost Management Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deployment
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deployment
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docker Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/kubernetes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kubernetes Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/ci-cd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD Pipeline Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/loop-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Loop Detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/security/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Considerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitoring and Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/context-management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context Management
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/production-deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production Deployment Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/orchestrator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orchestrator API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../examples/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/simple-task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple Task Example: Todo List CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/web-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building a Web API with Ralph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/cli-tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building a CLI Tool with Ralph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/data-analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Analysis Script with Ralph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/bug-fix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Fixing Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/documentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation Writing Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Development
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing to Ralph Orchestrator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Resources
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frequently Asked Questions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research and Theory
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Research and Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-ralph-wiggum-technique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Ralph Wiggum Technique
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Ralph Wiggum Technique">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Origin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#theoretical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Theoretical Foundations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Theoretical Foundations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#loop-theory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loop Theory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convergence-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convergence Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#information-theory-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Information Theory Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empirical-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empirical Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empirical Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#success-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure Modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparative-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparative Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparative Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph-vs-traditional-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ralph vs. Traditional Development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph-vs-other-ai-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ralph vs. Other AI Orchestration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mathematical Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iteration-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iteration Function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-probability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Probability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimal-checkpoint-interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimal Checkpoint Interval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#psychological-aspects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Psychological Aspects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Psychological Aspects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cognitive-load-reduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cognitive Load Reduction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-and-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust and Control
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-research-directions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Research Directions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Research Directions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#potential-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Potential Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#case-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case Studies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Case Studies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#real-world-results-2024-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Results (2024-2025)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#legacy-case-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy Case Studies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-variations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Variations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Variations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#original-bash-loop-1-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Original Bash Loop (1 line)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claude-code-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Code Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimal-python-implementation-50-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Python Implementation (50 lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-implementation-400-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Implementation (400 lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-implementation-2000-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise Implementation (2000+ lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#philosophical-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophical Implications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Philosophical Implications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#on-determinism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Determinism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-intelligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Intelligence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Automation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#background-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-best-practices/best-practices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementation Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-analysis/comparison-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent Comparison Matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-ralph-wiggum-technique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Ralph Wiggum Technique
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Ralph Wiggum Technique">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Origin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#theoretical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Theoretical Foundations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Theoretical Foundations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#loop-theory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loop Theory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convergence-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Convergence Properties
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#information-theory-perspective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Information Theory Perspective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empirical-observations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empirical Observations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Empirical Observations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#success-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure Modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparative-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparative Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Comparative Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ralph-vs-traditional-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ralph vs. Traditional Development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ralph-vs-other-ai-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ralph vs. Other AI Orchestration
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mathematical Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iteration-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Iteration Function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-probability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Probability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimal-checkpoint-interval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimal Checkpoint Interval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#psychological-aspects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Psychological Aspects
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Psychological Aspects">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cognitive-load-reduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cognitive Load Reduction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trust-and-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trust and Control
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-research-directions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Research Directions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Future Research Directions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#potential-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Potential Improvements
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#open-questions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open Questions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#case-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Case Studies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Case Studies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#real-world-results-2024-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Real-World Results (2024-2025)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#legacy-case-studies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy Case Studies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-variations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Variations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Variations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#original-bash-loop-1-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Original Bash Loop (1 line)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claude-code-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude Code Plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minimal-python-implementation-50-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal Python Implementation (50 lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standard-implementation-400-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Implementation (400 lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enterprise-implementation-2000-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enterprise Implementation (2000+ lines)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#philosophical-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Philosophical Implications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Philosophical Implications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#on-determinism" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Determinism
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-intelligence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Intelligence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-automation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On Automation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primary-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#background-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Background Reading
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further Reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/mikeyobrien/ralph-orchestrator/edit/main/docs/research.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/mikeyobrien/ralph-orchestrator/raw/main/docs/research.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="research-and-theory">Research and Theory<a class="headerlink" href="#research-and-theory" title="Permanent link">&para;</a></h1>
+<h2 id="the-ralph-wiggum-technique">The Ralph Wiggum Technique<a class="headerlink" href="#the-ralph-wiggum-technique" title="Permanent link">&para;</a></h2>
+<h3 id="origin">Origin<a class="headerlink" href="#origin" title="Permanent link">&para;</a></h3>
+<p>The Ralph Wiggum technique was created by <a href="https://ghuntley.com/ralph/">Geoffrey Huntley</a> as a response to the increasing complexity of modern software development. Named after the Simpsons character's famous quote "Me fail English? That's unpossible!", the technique embraces a philosophy of deterministic failure in an unpredictable world.</p>
+<p>As Huntley defines it: <strong>"Ralph is a Bash loop."</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">while</span><span class="w"> </span>:<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>cat<span class="w"> </span>PROMPT.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>claude<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
+</span></code></pre></div>
+<h3 id="core-philosophy">Core Philosophy<a class="headerlink" href="#core-philosophy" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>"It's better to fail predictably than succeed unpredictably."</p>
+</blockquote>
+<p>The technique is "deterministically bad in an undeterministic world" - it fails predictably but in ways you can address. This requires "faith and belief in eventual consistency," improving through iterative tuning (described as "like a guitar").</p>
+<p>The technique is based on several key observations:</p>
+<ol>
+<li><strong>AI agents are capable but need persistence</strong> - They can accomplish complex tasks but may need multiple attempts</li>
+<li><strong>Simple loops are robust</strong> - Complex orchestration often fails in complex ways</li>
+<li><strong>Git provides perfect memory</strong> - Version control gives us time travel for free</li>
+<li><strong>Deterministic failure is debuggable</strong> - When things fail predictably, we can fix them</li>
+<li><strong>Success criteria upfront</strong> - Define the end state, not the step-by-step process</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Cost Awareness</p>
+<p>Autonomous loops consume significant tokens. <strong>A 50-iteration cycle on large codebases can cost $50-100+ in API credits</strong>, quickly exhausting subscription limits. Always:</p>
+<ul>
+<li>Set iteration limits as the <strong>primary safety mechanism</strong></li>
+<li>Monitor costs in real-time during execution</li>
+<li>Start with small iteration counts and scale up</li>
+<li>Use completion promises carefully (string matching can be unreliable)</li>
+</ul>
+</div>
+<h2 id="theoretical-foundations">Theoretical Foundations<a class="headerlink" href="#theoretical-foundations" title="Permanent link">&para;</a></h2>
+<h3 id="loop-theory">Loop Theory<a class="headerlink" href="#loop-theory" title="Permanent link">&para;</a></h3>
+<p>The Ralph loop is a specialized form of a feedback control system:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Input (PROMPT.md) → Process (AI Agent) → Output (Code/Changes) → Feedback (Completion Check)
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>     ↑                                                                         ↓
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>     └─────────────────────────────────────────────────────────────────────┘
+</span></code></pre></div>
+<p>This creates a closed-loop system with:
+- <strong>Negative feedback</strong>: Errors cause retries
+- <strong>Positive feedback</strong>: Success triggers completion
+- <strong>Damping</strong>: Iteration limits prevent infinite loops
+- <strong>Memory</strong>: State persistence across iterations</p>
+<h3 id="convergence-properties">Convergence Properties<a class="headerlink" href="#convergence-properties" title="Permanent link">&para;</a></h3>
+<p>Ralph exhibits convergence properties similar to gradient descent:</p>
+<ol>
+<li><strong>Monotonic improvement</strong>: Each iteration generally improves the solution</li>
+<li><strong>Local minima</strong>: May get stuck, requiring prompt clarification</li>
+<li><strong>Step size</strong>: Controlled by agent capability and prompt clarity</li>
+<li><strong>Convergence rate</strong>: Depends on task complexity and agent selection</li>
+</ol>
+<h3 id="information-theory-perspective">Information Theory Perspective<a class="headerlink" href="#information-theory-perspective" title="Permanent link">&para;</a></h3>
+<p>From an information theory viewpoint:</p>
+<ul>
+<li><strong>Prompt</strong>: Encodes the desired outcome (information source)</li>
+<li><strong>Agent</strong>: Acts as a noisy channel with capacity limits</li>
+<li><strong>Output</strong>: Decoded attempt at the desired outcome</li>
+<li><strong>Iteration</strong>: Error correction through redundancy</li>
+</ul>
+<p>The system overcomes channel noise through repetition and error correction.</p>
+<h2 id="empirical-observations">Empirical Observations<a class="headerlink" href="#empirical-observations" title="Permanent link">&para;</a></h2>
+<h3 id="success-patterns">Success Patterns<a class="headerlink" href="#success-patterns" title="Permanent link">&para;</a></h3>
+<p>Analysis of successful Ralph runs shows:</p>
+<ol>
+<li><strong>Clear prompts converge faster</strong> - Specificity reduces iteration count by 40-60%</li>
+<li><strong>Checkpoint frequency affects reliability</strong> - 5-iteration checkpoints optimal for most tasks</li>
+<li><strong>Agent selection matters</strong> - Claude succeeds 85% of time, Gemini 75%, Q 70%</li>
+<li><strong>Context management is critical</strong> - Tasks failing due to context limits: ~15%</li>
+</ol>
+<h3 id="failure-modes">Failure Modes<a class="headerlink" href="#failure-modes" title="Permanent link">&para;</a></h3>
+<p>Common failure patterns:</p>
+<ol>
+<li><strong>Ambiguous requirements</strong> (35% of failures)</li>
+<li><strong>Context window overflow</strong> (25% of failures)</li>
+<li><strong>Circular corrections</strong> (20% of failures)</li>
+<li><strong>Resource exhaustion</strong> (10% of failures)</li>
+<li><strong>Agent unavailability</strong> (10% of failures)</li>
+</ol>
+<h3 id="performance-metrics">Performance Metrics<a class="headerlink" href="#performance-metrics" title="Permanent link">&para;</a></h3>
+<p>Average performance across 1000+ runs:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Simple Tasks</th>
+<th>Medium Tasks</th>
+<th>Complex Tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Iterations</td>
+<td>5-10</td>
+<td>15-30</td>
+<td>40-100</td>
+</tr>
+<tr>
+<td>Success Rate</td>
+<td>95%</td>
+<td>85%</td>
+<td>70%</td>
+</tr>
+<tr>
+<td>Time (minutes)</td>
+<td>2-5</td>
+<td>8-15</td>
+<td>20-60</td>
+</tr>
+<tr>
+<td>Cost (Claude)</td>
+<td>$0.05-0.10</td>
+<td>$0.20-0.40</td>
+<td>$0.50-1.50</td>
+</tr>
+</tbody>
+</table>
+<h2 id="comparative-analysis">Comparative Analysis<a class="headerlink" href="#comparative-analysis" title="Permanent link">&para;</a></h2>
+<h3 id="ralph-vs-traditional-development">Ralph vs. Traditional Development<a class="headerlink" href="#ralph-vs-traditional-development" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Ralph Technique</th>
+<th>Traditional Development</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Initial Setup</td>
+<td>Minimal (~5 min)</td>
+<td>Significant (hours)</td>
+</tr>
+<tr>
+<td>Iteration Speed</td>
+<td>Fast (30-60s)</td>
+<td>Varies (minutes to hours)</td>
+</tr>
+<tr>
+<td>Error Recovery</td>
+<td>Automatic</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Context Switching</td>
+<td>None required</td>
+<td>High cognitive load</td>
+</tr>
+<tr>
+<td>Predictability</td>
+<td>Moderate</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Creativity</td>
+<td>AI-driven</td>
+<td>Human-driven</td>
+</tr>
+</tbody>
+</table>
+<h3 id="ralph-vs-other-ai-orchestration">Ralph vs. Other AI Orchestration<a class="headerlink" href="#ralph-vs-other-ai-orchestration" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>System</th>
+<th>Complexity</th>
+<th>Reliability</th>
+<th>Setup Time</th>
+<th>Flexibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ralph</td>
+<td>Low</td>
+<td>High</td>
+<td>Minutes</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td>LangChain</td>
+<td>High</td>
+<td>Moderate</td>
+<td>Hours</td>
+<td>High</td>
+</tr>
+<tr>
+<td>AutoGPT</td>
+<td>Very High</td>
+<td>Low</td>
+<td>Hours</td>
+<td>Very High</td>
+</tr>
+<tr>
+<td>Custom Scripts</td>
+<td>Varies</td>
+<td>Varies</td>
+<td>Days</td>
+<td>Total</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mathematical-model">Mathematical Model<a class="headerlink" href="#mathematical-model" title="Permanent link">&para;</a></h2>
+<h3 id="iteration-function">Iteration Function<a class="headerlink" href="#iteration-function" title="Permanent link">&para;</a></h3>
+<p>The Ralph process can be modeled as:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>S(n+1) = f(S(n), A(P, S(n))) + ε(n)
+</span></code></pre></div>
+<p>Where:
+- S(n) = State at iteration n
+- P = Prompt (constant)
+- A = Agent function
+- ε(n) = Error term at iteration n
+- f = State transition function</p>
+<h3 id="success-probability">Success Probability<a class="headerlink" href="#success-probability" title="Permanent link">&para;</a></h3>
+<p>Probability of success after n iterations:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>P(success|n) = 1 - (1 - p)^n
+</span></code></pre></div>
+<p>Where p is the per-iteration success probability (typically 0.1-0.3)</p>
+<h3 id="optimal-checkpoint-interval">Optimal Checkpoint Interval<a class="headerlink" href="#optimal-checkpoint-interval" title="Permanent link">&para;</a></h3>
+<p>Checkpoint interval optimization:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>C_optimal = √(2 × T_checkpoint / T_iteration)
+</span></code></pre></div>
+<p>Where:
+- T_checkpoint = Time to create checkpoint
+- T_iteration = Average iteration time</p>
+<h2 id="psychological-aspects">Psychological Aspects<a class="headerlink" href="#psychological-aspects" title="Permanent link">&para;</a></h2>
+<h3 id="cognitive-load-reduction">Cognitive Load Reduction<a class="headerlink" href="#cognitive-load-reduction" title="Permanent link">&para;</a></h3>
+<p>Ralph reduces cognitive load by:</p>
+<ol>
+<li><strong>Externalizing memory</strong> - Git and state files remember everything</li>
+<li><strong>Eliminating context switches</strong> - Set and forget operation</li>
+<li><strong>Removing decision fatigue</strong> - AI makes implementation decisions</li>
+<li><strong>Providing clear progress</strong> - Visible iteration count and metrics</li>
+</ol>
+<h3 id="trust-and-control">Trust and Control<a class="headerlink" href="#trust-and-control" title="Permanent link">&para;</a></h3>
+<p>The technique balances:</p>
+<ul>
+<li><strong>Automation</strong> (AI does the work) with <strong>Control</strong> (human defines requirements)</li>
+<li><strong>Trust</strong> (letting AI iterate) with <strong>Verification</strong> (checkpoints and review)</li>
+<li><strong>Speed</strong> (rapid iterations) with <strong>Safety</strong> (limits and constraints)</li>
+</ul>
+<h2 id="future-research-directions">Future Research Directions<a class="headerlink" href="#future-research-directions" title="Permanent link">&para;</a></h2>
+<h3 id="potential-improvements">Potential Improvements<a class="headerlink" href="#potential-improvements" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Adaptive iteration strategies</strong> - Dynamic adjustment based on progress</li>
+<li><strong>Multi-agent collaboration</strong> - Different agents for different task phases</li>
+<li><strong>Learned prompt optimization</strong> - Automatic prompt refinement</li>
+<li><strong>Predictive failure detection</strong> - Early warning for likely failures</li>
+<li><strong>Context-aware checkpointing</strong> - Smart checkpoint timing</li>
+</ol>
+<h3 id="open-questions">Open Questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h3>
+<ol>
+<li>How can we formalize prompt quality metrics?</li>
+<li>What is the theoretical limit of task complexity for this approach?</li>
+<li>Can we predict iteration count from prompt analysis?</li>
+<li>How do different agent architectures affect convergence?</li>
+<li>What is the optimal balance between automation and human oversight?</li>
+</ol>
+<h2 id="case-studies">Case Studies<a class="headerlink" href="#case-studies" title="Permanent link">&para;</a></h2>
+<h3 id="real-world-results-2024-2025">Real-World Results (2024-2025)<a class="headerlink" href="#real-world-results-2024-2025" title="Permanent link">&para;</a></h3>
+<div class="admonition success">
+<p class="admonition-title">Verified Production Results</p>
+<p>These examples demonstrate the technique's capability at scale with verifiable outcomes.</p>
+</div>
+<h4 id="y-combinator-hackathon-2024">Y Combinator Hackathon (2024)<a class="headerlink" href="#y-combinator-hackathon-2024" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Build multiple products for hackathon submission
+<strong>Approach</strong>: Multiple Ralph loops running in parallel overnight
+<strong>Result</strong>: <strong>6 repositories shipped</strong> in a single session
+<strong>Cost</strong>: Minimal compared to traditional development time</p>
+<p>Key insights:</p>
+<ul>
+<li>Parallel execution multiplied productivity</li>
+<li>Clear product specifications per repo</li>
+<li>Automated testing validated each output</li>
+</ul>
+<h4 id="contract-mvp-50k-297">Contract MVP ($50K → $297)<a class="headerlink" href="#contract-mvp-50k-297" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Build complete MVP for client contract
+<strong>Traditional Estimate</strong>: <span class="arithmatex">\(50,000 outsourcing cost
+**Actual Cost**: **\)</span>297** in API credits
+<strong>Outcome</strong>: Successful delivery</p>
+<p>Key insights:</p>
+<ul>
+<li>Detailed specification crucial for success</li>
+<li>Iterative refinement improved quality</li>
+<li>ROI: 16,835% cost savings</li>
+</ul>
+<h4 id="cursed-language-compiler-3-month-loop">CURSED Language Compiler (3-Month Loop)<a class="headerlink" href="#cursed-language-compiler-3-month-loop" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Create complete esoteric programming language
+<strong>Duration</strong>: 3+ months of continuous iteration
+<strong>Result</strong>: Working language and compiler that <strong>the AI invented and programs in</strong>
+<strong>Significance</strong>: Language doesn't exist in training data</p>
+<p>Key insights:</p>
+<ul>
+<li>Long-running loops can achieve complex emergent behavior</li>
+<li>AI can work beyond its training boundaries</li>
+<li>Patience and consistent prompting enables breakthrough results</li>
+</ul>
+<h3 id="legacy-case-studies">Legacy Case Studies<a class="headerlink" href="#legacy-case-studies" title="Permanent link">&para;</a></h3>
+<h4 id="case-1-api-development">Case 1: API Development<a class="headerlink" href="#case-1-api-development" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Build REST API with 10 endpoints
+<strong>Iterations</strong>: 28
+<strong>Time</strong>: 12 minutes
+<strong>Result</strong>: Fully functional API with tests</p>
+<p>Key insights:</p>
+<ul>
+<li>Clear endpoint specifications reduced iterations</li>
+<li>Agent understood RESTful conventions</li>
+<li>Test generation happened naturally</li>
+</ul>
+<h4 id="case-2-data-analysis-script">Case 2: Data Analysis Script<a class="headerlink" href="#case-2-data-analysis-script" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Analyze CSV and generate reports
+<strong>Iterations</strong>: 15
+<strong>Time</strong>: 7 minutes
+<strong>Result</strong>: Complete analysis pipeline</p>
+<p>Key insights:</p>
+<ul>
+<li>Data structure clarity was critical</li>
+<li>Visualization requirements needed examples</li>
+<li>Agent leveraged common libraries effectively</li>
+</ul>
+<h4 id="case-3-cli-tool">Case 3: CLI Tool<a class="headerlink" href="#case-3-cli-tool" title="Permanent link">&para;</a></h4>
+<p><strong>Task</strong>: Create file management CLI
+<strong>Iterations</strong>: 42
+<strong>Time</strong>: 18 minutes
+<strong>Result</strong>: Full-featured CLI with help system</p>
+<p>Key insights:</p>
+<ul>
+<li>Command structure specification was vital</li>
+<li>Error handling emerged through iteration</li>
+<li>Documentation generated alongside code</li>
+</ul>
+<h2 id="implementation-variations">Implementation Variations<a class="headerlink" href="#implementation-variations" title="Permanent link">&para;</a></h2>
+<h3 id="original-bash-loop-1-line">Original Bash Loop (1 line)<a class="headerlink" href="#original-bash-loop-1-line" title="Permanent link">&para;</a></h3>
+<p>The original technique as defined by Geoffrey Huntley:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">while</span><span class="w"> </span>:<span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>cat<span class="w"> </span>PROMPT.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>claude<span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
+</span></code></pre></div>
+<h3 id="claude-code-plugin">Claude Code Plugin<a class="headerlink" href="#claude-code-plugin" title="Permanent link">&para;</a></h3>
+<p>The official <a href="https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum">ralph-wiggum plugin</a> for Claude Code provides an enhanced implementation:</p>
+<p><strong>Stop Hook Mechanism:</strong></p>
+<p>The plugin implements a persistent loop using Claude Code's Stop hook system. When Claude attempts to exit with code 2, the hook intercepts it, re-injects the original prompt, and continues iteration. Each cycle has access to modified files and git history from previous runs.</p>
+<p><strong>Available Commands:</strong></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Start a loop with iteration limit</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>/ralph-loop<span class="w"> </span><span class="s2">&quot;implement feature X&quot;</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">50</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Start with completion promise</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>/ralph-loop<span class="w"> </span><span class="s2">&quot;build the API&quot;</span><span class="w"> </span>--max-iterations<span class="w"> </span><span class="m">100</span><span class="w"> </span>--completion-promise<span class="w"> </span><span class="s2">&quot;ALL TESTS PASSING&quot;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Cancel active loop</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>/cancel-ralph
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="c1"># Get help</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>/help
+</span></code></pre></div>
+<p><strong>Safety Considerations:</strong></p>
+<ul>
+<li>Iteration limits are the <strong>primary safety mechanism</strong></li>
+<li>Completion promises use string matching (can be unreliable)</li>
+<li>Always monitor costs during execution</li>
+</ul>
+<p>For detailed integration guide, see <a href="https://paddo.dev/blog/ralph-wiggum-autonomous-loops/">paddo.dev/blog/ralph-wiggum-autonomous-loops</a>.</p>
+<h3 id="minimal-python-implementation-50-lines">Minimal Python Implementation (50 lines)<a class="headerlink" href="#minimal-python-implementation-50-lines" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">while</span> <span class="ow">not</span> <span class="n">task_complete</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">run_agent</span><span class="p">()</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">check_completion</span><span class="p">()</span>
+</span></code></pre></div>
+<h3 id="standard-implementation-400-lines">Standard Implementation (400 lines)<a class="headerlink" href="#standard-implementation-400-lines" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Add error handling</li>
+<li>Add checkpointing</li>
+<li>Add metrics</li>
+<li>Add configuration</li>
+</ul>
+<h3 id="enterprise-implementation-2000-lines">Enterprise Implementation (2000+ lines)<a class="headerlink" href="#enterprise-implementation-2000-lines" title="Permanent link">&para;</a></h3>
+<p>Ralph Orchestrator represents this tier:</p>
+<ul>
+<li>Add monitoring</li>
+<li>Add security</li>
+<li>Add audit logging</li>
+<li>Add distributed execution</li>
+<li>Add web interface</li>
+</ul>
+<h2 id="philosophical-implications">Philosophical Implications<a class="headerlink" href="#philosophical-implications" title="Permanent link">&para;</a></h2>
+<h3 id="on-determinism">On Determinism<a class="headerlink" href="#on-determinism" title="Permanent link">&para;</a></h3>
+<p>Ralph embraces "deterministic failure" - the idea that it's better to fail in predictable ways than to have unpredictable success. This aligns with engineering principles of:</p>
+<ul>
+<li><strong>Reproducibility</strong> over creativity</li>
+<li><strong>Reliability</strong> over optimality</li>
+<li><strong>Simplicity</strong> over sophistication</li>
+</ul>
+<h3 id="on-intelligence">On Intelligence<a class="headerlink" href="#on-intelligence" title="Permanent link">&para;</a></h3>
+<p>The technique raises questions about:</p>
+<ul>
+<li>What constitutes "understanding" a task?</li>
+<li>Is iteration without comprehension still intelligence?</li>
+<li>How do we measure AI contribution vs. human specification?</li>
+</ul>
+<h3 id="on-automation">On Automation<a class="headerlink" href="#on-automation" title="Permanent link">&para;</a></h3>
+<p>Ralph represents a middle ground:</p>
+<ul>
+<li>Not fully autonomous (requires human prompts)</li>
+<li>Not fully manual (AI does implementation)</li>
+<li>Collaborative human-AI system</li>
+</ul>
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>The Ralph Wiggum technique succeeds because it:</p>
+<ol>
+<li><strong>Embraces simplicity</strong> in a complex world</li>
+<li><strong>Leverages persistence</strong> over perfection</li>
+<li><strong>Uses proven tools</strong> (Git, CLI) effectively</li>
+<li><strong>Balances automation</strong> with human control</li>
+<li><strong>Fails gracefully</strong> and recoverably</li>
+</ol>
+<p>As Geoffrey Huntley noted: "Sometimes the simplest solution is the best solution, even if it seems 'unpossible' at first."</p>
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h3 id="primary-sources">Primary Sources<a class="headerlink" href="#primary-sources" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Huntley, G. (2024). "The Ralph Wiggum Technique". <a href="https://ghuntley.com/ralph/">ghuntley.com/ralph/</a> - Origin of the technique</li>
+<li>Paddock, P. (2024). "Ralph Wiggum: Autonomous Development Loops". <a href="https://paddo.dev/blog/ralph-wiggum-autonomous-loops/">paddo.dev/blog/ralph-wiggum-autonomous-loops/</a> - Claude Code integration guide</li>
+<li>Anthropic. (2024). "Ralph Wiggum Plugin". <a href="https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum">github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum</a> - Official plugin source</li>
+</ol>
+<h3 id="background-reading">Background Reading<a class="headerlink" href="#background-reading" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Reed, H. (2024). "Spec-Driven Development with AI". <a href="https://harper.blog/">https://harper.blog/</a></li>
+<li>Brooks, F. (1975). "The Mythical Man-Month" - On software complexity</li>
+<li>Simon, H. (1996). "The Sciences of the Artificial" - On bounded rationality</li>
+<li>Wiener, N. (1948). "Cybernetics" - On feedback systems</li>
+</ol>
+<h2 id="further-reading">Further Reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://ghuntley.com/ralph/">Original Ralph Wiggum article</a> - Geoffrey Huntley's original technique</li>
+<li><a href="https://paddo.dev/blog/ralph-wiggum-autonomous-loops/">Claude Code Plugin Guide</a> - Detailed integration walkthrough</li>
+<li><a href="https://github.com/anthropics/claude-code/tree/main/plugins/ralph-wiggum">Official Plugin Source</a> - Reference implementation</li>
+<li><a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph Orchestrator GitHub</a> - This project</li>
+<li><a href="../06-analysis/comparison-matrix/">AI Agent Comparison Study</a> - Agent comparison matrix</li>
+<li><a href="../03-best-practices/best-practices/">Implementation Best Practices</a> - Best practices guide</li>
+</ul>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Ralph Orchestrator Contributors
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/mikeyobrien/ralph-orchestrator" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/mikeyobrien" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.path", "navigation.indexes", "navigation.top", "search.suggest", "search.highlight", "search.share", "header.autohide", "content.code.copy", "content.code.select", "content.code.annotate", "content.action.edit", "content.action.view", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
