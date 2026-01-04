@@ -225,11 +225,14 @@ Advanced Options:
     -H "Content-Type: application/json" \
     -H "x-api-key: <secret>" \
     -d '{
+      "classification": "ai_only", # or w2_employee | contractor_1099
       "prompt_file": "/workspace/PROMPT.md",
       "config": { "agent": "auto", "max_iterations": 5 }
     }'
   ```
   Response includes `status_url` for polling with `GET /runs/{run_id}`; cancel with `DELETE /runs/{run_id}`; list with `GET /runs`.
+  - Required field: `classification` (immutable per run). Human classifications (`w2_employee` or `contractor_1099`) require monetary `pay` and, for W2, `pay_type` of `hourly` or `salary`. Non-cash-only compensation, on-call schedules for human runs, or human indicators on `ai_only` requests are rejected with a 400 body of `{"error": "illegal_state", "reason": "<explanation>"}`.
+  - Successful runs emit a `compliance_manifest.json` artifact. Runs fail if forbidden output phrases (e.g., "unpaid", "volunteer", "equity instead of wages") appear in generated text.
 - **Fly.io hint:** Use the existing `Dockerfile`, set `RALPH_ACTIONS_PORT=8080` and `RALPH_ACTIONS_API_KEY`, and run `python -m ralph_orchestrator.web.actions_server --host 0.0.0.0 --port 8080` as the Fly process with `internal_port = 8080`.
 - **Test deployment (Docker):**
   ```bash
@@ -243,6 +246,42 @@ Advanced Options:
   ```bash
   curl -H "x-api-key: <secret>" http://localhost:8081/openapi.json -o customgpt-actions-openapi.json
   ```
+
+### API endpoints
+
+- `GET /healthz` — liveness probe, returns `{"status":"ok"}`.
+- `POST /runs` — start a run. Body:
+  ```json
+  {
+    "classification": "w2_employee",
+    "prompt_file": "/workspace/PROMPT.md",
+    "pay": 120000,
+    "pay_type": "salary",
+    "compensation": [],
+    "schedule": "M-F",
+    "human_indicators": [],
+    "config": { "agent": "auto", "max_iterations": 5 },
+    "metadata": { "ticket": "ABC-123" }
+  }
+  ```
+  - 200: `{"run_id": "...", "status_url": "http://.../runs/<id>"}`.
+  - 400: `{"error": "illegal_state", "reason": "<explanation>"}` on classification/compensation violations.
+- `GET /runs/{run_id}` — returns run status and artifacts:
+  ```json
+  {
+    "run_id": "...",
+    "state": "running|completed|failed|cancelled",
+    "agent": "auto",
+    "run_type": "w2_employee",
+    "prompt_file": "/workspace/PROMPT.md",
+    "progress": { "iterations": 1, "metrics": {...} },
+    "artifacts": ["/workspace/PROMPT.md", "/workspace/compliance_manifest.json"],
+    "error": null,
+    "metadata": { "ticket": "ABC-123" }
+  }
+  ```
+- `DELETE /runs/{run_id}` — cancel a run; returns the same shape as `GET /runs/{run_id}`.
+- `GET /runs` — list all known runs (newest first).
 
 ## ACP (Agent Client Protocol) Integration
 
