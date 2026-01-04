@@ -108,7 +108,7 @@ class OllamaAdapter(ToolAdapter):
             return ToolResponse(
                 success=False,
                 output="",
-                error="Ollama CLI is not available",
+                error="Ollama CLI is not available. Install from https://ollama.com/ and ensure the daemon is running.",
             )
 
         model = kwargs.get("model") or self.default_model

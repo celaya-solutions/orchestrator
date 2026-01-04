@@ -22,9 +22,10 @@ while not task_complete:
 
 Ralph supports multiple AI agents through a unified interface:
 
-- **Claude** (Anthropic Claude Code CLI)
-- **Q Chat** (Q CLI tool) 
+- **Ollama** (local CLI, default)
 - **Gemini** (Google Gemini CLI)
+- **Claude** (Anthropic Claude Code CLI)
+- **ACP** (Agent Client Protocol adapter for compatible agents)
 
 Each agent is executed through subprocess calls with consistent error handling and output capture.
 

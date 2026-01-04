@@ -87,6 +87,9 @@
 
 ## O
 
+**Ollama**
+: Local-first model runner used as Ralph's default agent (e.g., `gemma3:1b`), with no remote API billing.
+
 **Orchestrator**
 : The main component that manages the execution loop, agent interaction, and state management.
 
@@ -100,11 +103,6 @@
 
 **Plugin**
 : Extension mechanism for adding custom agents or commands to Ralph.
-
-## Q
-
-**Q Chat**
-: An AI assistant accessible via Q CLI. Smaller context window (8K tokens) but fast execution.
 
 ## R
 

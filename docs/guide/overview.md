@@ -52,9 +52,9 @@ For detailed Claude Code integration, see [paddo.dev/blog/ralph-wiggum-autonomou
 graph TB
     A[Prompt File] --> B[Ralph Orchestrator]
     B --> C{AI Agent}
-    C --> D[Claude]
-    C --> E[Q Chat]
-    C --> F[Gemini]
+    C --> D[Ollama]
+    C --> E[Gemini]
+    C --> F[Claude]
     D --> G[Execute Task]
     E --> G
     F --> G
@@ -265,9 +265,9 @@ graph LR
     end
 
     subgraph "AI Agents"
-        H[Claude]
-        I[Q Chat]
-        J[Gemini]
+        H[Ollama]
+        I[Gemini]
+        J[Claude]
     end
 
     subgraph "Persistence"

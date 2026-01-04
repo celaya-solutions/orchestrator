@@ -26,7 +26,7 @@ Based on Huntley's technique, this implementation provides enterprise-grade safe
 <div class="grid cards" markdown>
 
 - **🤖 Multi-Agent Support**
-  Works seamlessly with Claude, Q Chat, Gemini CLI, and ACP-compliant agents with automatic detection
+  Works seamlessly with Ollama (default local), Gemini CLI, Claude, and ACP-compliant agents with automatic detection (Ollama → Gemini → Claude)
 
 - **💰 Cost Management**  
   Real-time token tracking, cost calculation, and configurable spending limits

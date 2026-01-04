@@ -108,7 +108,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Q Chat integration improvements
+- Ollama integration improvements
 - Real-time metrics collection
 - Interactive CLI mode
 - Bash and ZSH completion scripts
@@ -151,7 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release with core functionality
 - Claude CLI integration
-- Q Chat integration
+- Ollama integration
 - Git-based checkpointing
 - Prompt archiving
 - State persistence
