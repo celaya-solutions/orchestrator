@@ -8,7 +8,7 @@ import signal
 import logging
 import asyncio
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import json
 from datetime import datetime
 
@@ -21,6 +21,7 @@ from .metrics import Metrics, CostTracker, IterationStats, TriggerReason
 from .safety import SafetyGuard
 from .context import ContextManager
 from .output import RalphConsole
+from .main import RunType
 
 # Setup logging
 logging.basicConfig(
@@ -48,7 +49,8 @@ class RalphOrchestrator:
         acp_permission_mode: str = None,
         iteration_telemetry: bool = True,
         output_preview_length: int = 500,
-        ollama_model: str = OllamaAdapter.DEFAULT_MODEL
+        ollama_model: str = OllamaAdapter.DEFAULT_MODEL,
+        run_type: RunType = RunType.AI_ONLY
     ):
         """Initialize the orchestrator.
 
@@ -67,6 +69,7 @@ class RalphOrchestrator:
             iteration_telemetry: Enable per-iteration telemetry capture
             output_preview_length: Max chars for output preview in telemetry
             ollama_model: Default Ollama model to use
+            run_type: Classification of the run (immutable once set)
         """
         # Store ACP-specific settings
         self.acp_agent = acp_agent
@@ -77,6 +80,7 @@ class RalphOrchestrator:
             config = prompt_file_or_config
             self.prompt_file = Path(config.prompt_file)
             self.prompt_text = getattr(config, 'prompt_text', None)
+            self.run_type = getattr(config, 'run_type', RunType.AI_ONLY)
             self.primary_tool = config.agent.value if hasattr(config.agent, 'value') else str(config.agent)
             self.max_iterations = config.max_iterations
             self.max_runtime = config.max_runtime
@@ -92,6 +96,7 @@ class RalphOrchestrator:
             # Individual parameters
             self.prompt_file = Path(prompt_file_or_config if prompt_file_or_config else "PROMPT.md")
             self.prompt_text = None
+            self.run_type = run_type
             self.primary_tool = primary_tool
             self.max_iterations = max_iterations
             self.max_runtime = max_runtime
@@ -139,12 +144,37 @@ class RalphOrchestrator:
         self.completed_tasks = []  # List of completed tasks with results
         self.task_start_time = None  # Start time of current task
         self.last_response_output = None  # Final agent output from last iteration
+        self.last_metrics_file: Optional[Path] = None  # Metrics artifact from the most recent run
         
         # Create directories
         self.archive_dir.mkdir(parents=True, exist_ok=True)
         Path(".agent").mkdir(exist_ok=True)
         
         logger.info(f"Ralph Orchestrator initialized with {primary_tool}")
+
+    @property
+    def run_type(self) -> RunType:
+        """Immutable classification for the current run."""
+        return self._run_type
+
+    @run_type.setter
+    def run_type(self, value: RunType) -> None:
+        normalized = value if isinstance(value, RunType) else RunType(value)
+        if hasattr(self, "_run_type"):
+            if normalized != self._run_type:
+                if hasattr(self, "stop_requested"):
+                    self.stop_requested = True
+                raise RuntimeError("Run type is immutable and cannot change mid-run")
+            return
+        self._run_type = normalized
+
+    def enforce_run_type(self, run_type: RunType) -> None:
+        """Ensure the orchestrator run type matches the declared classification."""
+        if self.run_type != run_type:
+            self.stop_requested = True
+            raise RuntimeError(
+                f"Run type mismatch detected (expected {self.run_type.value}, got {run_type.value})"
+            )
     
     def _initialize_adapters(self) -> Dict[str, ToolAdapter]:
         """Initialize available adapters."""
@@ -735,6 +765,7 @@ class RalphOrchestrator:
         }
 
         metrics_file.write_text(json.dumps(metrics_data, indent=2))
+        self.last_metrics_file = metrics_file
         self.console.print_success(f"Metrics saved to {metrics_file}")
     
     def _extract_tasks_from_prompt(self, prompt: str):

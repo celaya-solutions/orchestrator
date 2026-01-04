@@ -210,6 +210,7 @@ class RalphConfig:
 
     # Core configuration fields
     agent: AgentType = AgentType.AUTO
+    run_type: RunType = RunType.AI_ONLY
     prompt_file: str = DEFAULT_PROMPT_FILE
     prompt_text: Optional[str] = None  # Direct prompt text (overrides prompt_file)
     max_iterations: int = DEFAULT_MAX_ITERATIONS
