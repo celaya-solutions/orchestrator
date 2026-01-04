@@ -247,6 +247,62 @@ Advanced Options:
   curl -H "x-api-key: <secret>" http://localhost:8081/openapi.json -o customgpt-actions-openapi.json
   ```
 
+## Architecture (mermaid)
+
+```mermaid
+graph TD
+  subgraph CLI & Core
+    A[ralph_orchestrator/main.py<br/>CLI args, config enums] --> B[RalphConfig]
+    B --> C[RalphOrchestrator<br/>loop, safety, metrics]
+    C --> D[Adapters<br/>Ollama/Gemini/Claude/ACP]
+    C --> E[ContextManager<br/>prompt, cache]
+    C --> F[SafetyGuard<br/>limits, loop detection]
+    C --> G[Metrics & CostTracker]
+    C --> H[Output/Console]
+  end
+
+  subgraph Web/API
+    I[web/actions_server.py<br/>FastAPI actions] --> C
+    I --> J[ActionRunManager<br/>state, tasks]
+  end
+
+  subgraph Artifacts
+    C --> K[.agent/metrics/*.json]
+    C --> L[Archived prompts]
+    I --> M[compliance_manifest.json]
+  end
+
+  subgraph Tests
+    N[tests/test_actions_server.py] --> I
+    O[tests/*] --> C
+  end
+```
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant API as FastAPI /runs
+  participant Manager as ActionRunManager
+  participant Orch as RalphOrchestrator
+  participant Adapter
+  participant Store as Artifacts
+
+  Client->>API: POST /runs {classification,prompt_file,...}
+  API->>Manager: validate + start_run()
+  Manager->>Orch: create orchestrator (run_type immutable)
+  Manager->>Orch: arun() task
+  loop iterations
+    Orch->>Adapter: aexecute(prompt)
+    Adapter-->>Orch: response/output
+    Orch-->>Store: metrics, prompt archive
+    Orch-->>Manager: forbidden phrase check?
+  end
+  Orch-->>Manager: complete | failed | cancelled
+  Manager-->>Store: compliance_manifest.json on success
+  Client->>API: GET/DELETE /runs/{id}
+  API-->>Client: status {state, artifacts, error?}
+```
+
 ### API endpoints
 
 - `GET /healthz` — liveness probe, returns `{"status":"ok"}`.
