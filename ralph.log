@@ -1,0 +1,66 @@
+╭─────────────────────────────╮                                                              
+│ Starting Ralph Orchestrator │                                                              
+╰─────────────────────────────╯                                                              
+ℹ Agent: auto
+ℹ Prompt: PROMPT.md
+ℹ Max iterations: 100
+ℹ Press Ctrl+C to stop gracefully
+
+---
+
+2026-01-04 12:57:44,514 - ralph-orchestrator.context - INFO - Extracted stable prefix: 0 chars
+2026-01-04 12:57:44,532 - ralph.adapter.ollama - INFO - Ollama adapter initialized - Command: ollama, Default model: gemma3:1b
+2026-01-04 12:57:44,532 - ralph.adapter.ollama - INFO - Ollama adapter initialized - Command: ollama, Default model: gemma3:1b
+2026-01-04 12:57:44,532 - ralph-orchestrator - INFO - Ollama adapter initialized
+2026-01-04 12:57:44,535 - ralph-orchestrator - WARNING - Gemini adapter not available
+2026-01-04 12:57:44,535 - ralph-orchestrator - INFO - Claude adapter initialized
+2026-01-04 12:57:44,535 - ralph_orchestrator.adapters.acp - WARNING - ACP agent command 'gemini' not found. Falling back to 'cat' for availability checks.
+2026-01-04 12:57:44,535 - ralph-orchestrator - INFO - Acp adapter initialized
+2026-01-04 12:57:44,535 - ralph-orchestrator - INFO - Auto-selected ollama adapter
+2026-01-04 12:57:44,535 - ralph-orchestrator - INFO - Ralph Orchestrator initialized with auto
+2026-01-04 12:57:44,536 - ralph-orchestrator - INFO - Starting Ralph orchestration loop
+
+=== RALPH ITERATION 1 ===
+
+2026-01-04 12:57:44,536 - ralph-orchestrator - INFO - Starting iteration 1
+2026-01-04 12:57:58,345 - ralph-orchestrator - INFO - Estimated cost: $0.0000 (total: $0.0000)
+✓ Iteration 1 completed successfully
+╭────────────────────────────╮                                                               
+│ Agent Output (Iteration 1) │                                                               
+╰────────────────────────────╯                                                               
+                                                                                             
+     1 {                                                                                     
+     2   "stop_reason.txt": "The classification is ambiguous – it’s not clear whether this   
+       is a 'business profile' or a 'role profile'. Further analysis is needed.",            
+     3   "violated_conditions.json": [                                                       
+     4 │   {                                                                                 
+     5 │     "violated_condition": "Classification == w2_employee and pay is missing",       
+     6 │     "details": "The classification explicitly requires a 'pay' field, which is      
+       missing for the provided data."                                                       
+     7 │   },                                                                                
+     8 │   {                                                                                 
+     9 │     "violated_condition": "Classification == contractor_1099 and pay is missing",   
+    10 │     "details": "The classification explicitly requires a 'pay' field, which is      
+       missing for the provided data."                                                       
+    11 │   },                                                                                
+    12 │   {                                                                                 
+    13 │     "violated_condition": "Classification == ai_only",                              
+    14 │     "details": "The classification is defined as 'ai_only'.  The data suggests a    
+       human labor involvement."                                                             
+    15 │   },                                                                                
+    16 │   {                                                                                 
+    17 │     "violated_condition": "Compensation includes tokens, tips-only, equity,         
+       reputation, or praise",                                                               
+    18 │     "details": "The data does not include a compensation information."              
+    19 │   },                                                                                
+    20 │   {                                                                                 
+    21 │     "violated_condition": "On-call schedule without wages",                         
+    22 │     "details": "The data does not include a schedule for wages."                    
+    23 │   }                                                                                 
+    24   ]                                                                                   
+    25 }                                                                                     
+                                                                                             
+
+=== RALPH ITERATION 2 ===
+
+2026-01-04 12:58:00,379 - ralph-orchestrator - INFO - Starting iteration 2
