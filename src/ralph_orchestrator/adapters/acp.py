@@ -668,10 +668,18 @@ class ACPAdapter(ToolAdapter):
             return await self._execute_prompt(enhanced_prompt, **kwargs)
 
         except ACPClientError as e:
+            error_msg = f"ACP error: {e}"
+            # Helpful hint when using a non-ACP binary like ollama
+            if "ollama" in (self.agent_command or ""):
+                error_msg = (
+                    "ACP error: Ollama does not speak ACP. "
+                    "Use `ralph run -a ollama` instead of ACP, "
+                    "or choose an ACP-capable agent (e.g., gemini --acp)."
+                )
             return ToolResponse(
                 success=False,
                 output="",
-                error=f"ACP error: {e}",
+                error=error_msg,
             )
         except Exception as e:
             return ToolResponse(
