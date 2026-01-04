@@ -63,7 +63,7 @@ def load_env_config():
     Load configuration from environment variables.
     
     Environment variables:
-        RALPH_AGENT: Agent to use (claude, q, gemini, auto)
+        RALPH_AGENT: Agent to use (ollama, gemini, claude, auto)
         RALPH_MAX_ITERATIONS: Maximum iterations
         RALPH_MAX_RUNTIME: Maximum runtime in seconds
         RALPH_CHECKPOINT_INTERVAL: Checkpoint interval
@@ -120,7 +120,7 @@ def parse_args():
     
     parser.add_argument(
         '--agent',
-        choices=['claude', 'q', 'gemini', 'auto'],
+        choices=['ollama', 'gemini', 'claude', 'auto'],
         default='auto',
         help='AI agent to use'
     )
@@ -191,7 +191,7 @@ def validate_config(config):
             raise ValueError(f"Missing required field: {field}")
     
     # Validate agent
-    valid_agents = ['claude', 'q', 'gemini', 'auto']
+    valid_agents = ['ollama', 'gemini', 'claude', 'auto']
     if config['agent'] not in valid_agents:
         raise ValueError(f"Invalid agent: {config['agent']}")
     
@@ -334,7 +334,7 @@ GEMINI_CONFIG = {
 
 ```python
 Q_CONFIG = {
-    'command': 'q',
+    'command': 'ollama',
     'args': [],
     'env': {},
     'timeout': 300,
@@ -368,7 +368,7 @@ class RuntimeConfig:
     
     def update_agent(self, agent):
         """Switch to different agent."""
-        if agent in ['claude', 'q', 'gemini']:
+        if agent in ['ollama', 'gemini', 'claude']:
             self.config['agent'] = agent
             self.history.append(self.config.copy())
     

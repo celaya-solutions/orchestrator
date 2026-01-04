@@ -2,7 +2,7 @@
 # This file configures Ralph and its AI agent adapters
 
 # Core orchestrator settings
-agent: auto                    # Which agent to use: claude, q, gemini, ollama, acp, auto
+agent: auto                    # Which agent to use: ollama, gemini, claude, acp, auto (auto prefers ollama)
 prompt_file: PROMPT.md         # Path to prompt file
 max_iterations: 100            # Maximum iterations before stopping
 max_runtime: 14400             # Maximum runtime in seconds (4 hours)
@@ -33,20 +33,13 @@ allow_unsafe_paths: false     # Allow potentially unsafe prompt paths
 
 # Adapter-specific configurations
 adapters:
-  claude:
-    enabled: true
-    timeout: 300              # Timeout in seconds
-    max_retries: 3            # Max retry attempts
-    tool_permissions:         # Tool permissions for Claude
-      allow_all: true         # Allow all tools without approval
-  
-  q:
+  ollama:
     enabled: true
     timeout: 300
     max_retries: 3
     args: []
     env: {}
-  
+
   gemini:
     enabled: true
     timeout: 300
@@ -54,9 +47,21 @@ adapters:
     args: []
     env: {}
   
-  ollama:
+  claude:
+    enabled: true
+    timeout: 300              # Timeout in seconds
+    max_retries: 3            # Max retry attempts
+    tool_permissions:         # Tool permissions for Claude
+      allow_all: true         # Allow all tools without approval
+
+  acp:                        # Agent Client Protocol adapter
     enabled: true
     timeout: 300
     max_retries: 3
     args: []
     env: {}
+    tool_permissions:
+      agent_command: gemini
+      agent_args: []
+      permission_mode: auto_approve  # auto_approve, deny_all, allowlist, interactive
+      permission_allowlist: []       # Patterns for allowlist mode

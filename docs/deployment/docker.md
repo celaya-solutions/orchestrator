@@ -178,8 +178,7 @@ Configure Ralph through environment variables:
 |----------|-------------|---------|
 | `CLAUDE_API_KEY` | Anthropic Claude API key | Required for Claude |
 | `GEMINI_API_KEY` | Google Gemini API key | Required for Gemini |
-| `Q_API_KEY` | Q Chat API key | Required for Q |
-| `RALPH_AGENT` | Default agent (claude/gemini/q/auto) | auto |
+| `RALPH_AGENT` | Default agent (ollama/gemini/claude/auto) | auto |
 | `RALPH_MAX_ITERATIONS` | Maximum loop iterations | 100 |
 | `RALPH_MAX_RUNTIME` | Maximum runtime in seconds | 14400 |
 | `RALPH_MAX_TOKENS` | Maximum total tokens | 1000000 |

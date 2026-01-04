@@ -7,6 +7,7 @@ import threading
 import time
 import yaml
 from pathlib import Path
+from unittest.mock import patch
 
 from ralph_orchestrator.main import (
     RalphConfig,
@@ -27,7 +28,7 @@ def test_yaml_config_loading():
                 'timeout': 600,
                 'args': ['--model', 'claude-3-sonnet']
             },
-            'q': False
+            'ollama': False
         }
     }
     
@@ -48,8 +49,8 @@ def test_yaml_config_loading():
         assert claude_config.timeout == 600
         assert claude_config.args == ['--model', 'claude-3-sonnet']
         
-        q_config = config.get_adapter_config('q')
-        assert q_config.enabled is False
+        ollama_config = config.get_adapter_config('ollama')
+        assert ollama_config.enabled is False
         
     finally:
         Path(config_path).unlink()
@@ -493,3 +494,21 @@ Build a REST API with:
         config = RalphConfig(prompt_text=prompt)
         assert "REST API" in config.prompt_text
         assert "Rate limiting" in config.prompt_text
+
+
+def test_main_uses_root_prompt_by_default(tmp_path, capsys, monkeypatch):
+    """Ensure default CLI prompt path is the root PROMPT.md when no flag is provided."""
+    from ralph_orchestrator import __main__
+
+    prompt = tmp_path / "PROMPT.md"
+    prompt.write_text("# Task\n")
+    monkeypatch.chdir(tmp_path)
+
+    with patch('sys.argv', ['ralph', '--dry-run']):
+        with pytest.raises(SystemExit) as exc_info:
+            __main__.main()
+
+    assert exc_info.value.code == 0
+    captured = capsys.readouterr()
+    combined_output = captured.out + captured.err
+    assert "PROMPT.md" in combined_output

@@ -150,11 +150,13 @@ class SecurityValidator:
                         f"Path resolves to dangerous system location: {path_str}"
                     )
 
-        # Resolve the path
+        # Resolve the path (use resolved version for safety checks, preserve original for return)
         if input_path.is_absolute():
+            candidate_path = input_path
             resolved_path = input_path.resolve()
         else:
-            resolved_path = (base_dir / input_path).resolve()
+            candidate_path = (base_dir / input_path).absolute()
+            resolved_path = candidate_path.resolve()
 
         # Ensure resolved path is within base directory or a safe location
         try:
@@ -178,7 +180,7 @@ class SecurityValidator:
                     f"Path traversal detected: {path} -> {resolved_path}"
                 ) from None
 
-        return resolved_path
+        return candidate_path
 
     @classmethod
     def validate_config_value(cls, key: str, value: Any) -> Any:

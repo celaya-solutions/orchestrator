@@ -79,8 +79,8 @@ class RalphConfig:
 ```python
 class AgentType(Enum):
     CLAUDE = "claude"
-    Q = "q"
     GEMINI = "gemini"
+    OLLAMA = "ollama"
     AUTO = "auto"
 ```
 
@@ -469,7 +469,7 @@ DEFAULT_MAX_PROMPT_SIZE = 10485760  # 10MB
 # Token costs per million
 TOKEN_COSTS = {
     "claude": {"input": 3.0, "output": 15.0},
-    "q": {"input": 0.5, "output": 1.5},
+    "ollama": {"input": 0.0, "output": 0.0},
     "gemini": {"input": 0.5, "output": 1.5}
 }
 

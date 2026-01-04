@@ -12,20 +12,13 @@ Before you begin, ensure you have:
 
 ## Step 1: Install an AI Agent
 
-Ralph works with multiple AI agents. Install at least one:
+Ralph works with multiple AI agents. Install at least one (auto mode prefers Ollama, then Gemini, then Claude):
 
-=== "Claude (Recommended)"
-
-    ```bash
-    npm install -g @anthropic-ai/claude-code
-    # Or visit https://claude.ai/code for setup instructions
-    ```
-
-=== "Q Chat"
+=== "Ollama (Default)"
 
     ```bash
-    pip install q-cli
-    # Or follow instructions at https://github.com/qchat/qchat
+    curl -fsSL https://ollama.com/install.sh | sh
+    ollama pull gemma3:1b
     ```
 
 === "Gemini"
@@ -33,6 +26,13 @@ Ralph works with multiple AI agents. Install at least one:
     ```bash
     npm install -g @google/gemini-cli
     # Configure with your API key
+    ```
+
+=== "Claude (Paid)"
+
+    ```bash
+    npm install -g @anthropic-ai/claude-code
+    # Or visit https://claude.ai/code for setup instructions
     ```
 
 === "ACP Agent"
@@ -86,6 +86,8 @@ python ralph_orchestrator.py --agent claude --prompt PROMPT.md
 # Or use an ACP-compliant agent
 python ralph_orchestrator.py --agent acp --acp-agent gemini --prompt PROMPT.md
 ```
+
+Auto mode tries Ollama first, then Gemini, then Claude (paid).
 
 ## Step 5: Monitor Progress
 
@@ -199,7 +201,7 @@ Now that you've run your first Ralph task:
 If Ralph can't find an AI agent:
 
 ```bash
-ERROR: No AI agents detected. Please install claude, q, gemini, or an ACP-compliant agent.
+ERROR: No AI agents detected. Please install ollama, gemini, claude, or an ACP-compliant agent.
 ```
 
 **Solution**: Install one of the supported agents (see Step 1)

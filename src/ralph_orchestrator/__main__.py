@@ -73,18 +73,15 @@ max_runtime: 14400
 verbose: false
 ollama_model: gemma3:1b
 
-# Adapter configurations
+# Adapter configurations (priority in auto mode: ollama -> gemini -> claude)
 adapters:
-  claude:
-    enabled: true
-    timeout: 300
-  q:
+  ollama:
     enabled: true
     timeout: 300
   gemini:
     enabled: true
     timeout: 300
-  ollama:
+  claude:
     enabled: true
     timeout: 300
   # ACP (Agent Client Protocol) adapter for Gemini CLI and other ACP-compatible agents
@@ -273,11 +270,11 @@ def generate_prompt_with_agent(rough_ideas: List[str], agent: str = "auto", outp
     # Map shorthand to full agent names
     agent_name_map = {
         "c": "claude",
-        "g": "gemini", 
-        "q": "qchat",
+        "g": "gemini",
+        "o": "ollama",
         "claude": "claude",
         "gemini": "gemini",
-        "qchat": "qchat",
+        "ollama": "ollama",
         "auto": "auto"
     }
     agent = agent_name_map.get(agent, agent)
@@ -334,13 +331,41 @@ IMPORTANT:
     # Import adapters
     try:
         from .adapters.claude import ClaudeAdapter
-        from .adapters.qchat import QChatAdapter
         from .adapters.gemini import GeminiAdapter
+        from .adapters.ollama import OllamaAdapter
     except ImportError:
         pass
     
-    # Try specified agent first
-    if agent == "claude" or agent == "auto":
+    # Try specified agent first (local-first preference)
+    if agent == "ollama" or agent == "auto":
+        try:
+            adapter = OllamaAdapter(default_model=DEFAULT_OLLAMA_MODEL)
+            if adapter.available:
+                result = adapter.execute(generation_prompt, model=DEFAULT_OLLAMA_MODEL)
+                if result.success:
+                    return Path(output_file).exists()
+            elif agent != "auto":
+                _console.print_error(
+                    "Ollama is not available. Install from https://ollama.com/ and ensure the daemon is running."
+                )
+        except Exception as e:
+            if agent != "auto":
+                _console.print_error(f"Ollama adapter failed: {e}")
+
+    if not success and (agent == "gemini" or agent == "auto"):
+        try:
+            adapter = GeminiAdapter()
+            if adapter.available:
+                result = adapter.execute(generation_prompt)
+                if result.success:
+                    success = True
+                    # Check if the file was created
+                    return Path(output_file).exists()
+        except Exception as e:
+            if agent != "auto":
+                _console.print_error(f"Gemini adapter failed: {e}")
+
+    if not success and (agent == "claude" or agent == "auto"):
         try:
             adapter = ClaudeAdapter()
             if adapter.available:
@@ -358,32 +383,6 @@ IMPORTANT:
         except Exception as e:
             if agent != "auto":
                 _console.print_error(f"Claude adapter failed: {e}")
-
-    if not success and (agent == "gemini" or agent == "auto"):
-        try:
-            adapter = GeminiAdapter()
-            if adapter.available:
-                result = adapter.execute(generation_prompt)
-                if result.success:
-                    success = True
-                    # Check if the file was created
-                    return Path(output_file).exists()
-        except Exception as e:
-            if agent != "auto":
-                _console.print_error(f"Gemini adapter failed: {e}")
-
-    if not success and (agent == "qchat" or agent == "auto"):
-        try:
-            adapter = QChatAdapter()
-            if adapter.available:
-                result = adapter.execute(generation_prompt)
-                if result.success:
-                    success = True
-                    # Check if the file was created
-                    return Path(output_file).exists()
-        except Exception as e:
-            if agent != "auto":
-                _console.print_error(f"QChat adapter failed: {e}")
     
     # If no adapter succeeded, return False
     return False
@@ -456,9 +455,9 @@ Examples:
     )
     prompt_parser.add_argument(
         '-a', '--agent',
-        choices=['claude', 'c', 'gemini', 'g', 'qchat', 'q', 'ollama', 'o', 'auto'],
+        choices=['ollama', 'o', 'gemini', 'g', 'claude', 'c', 'acp', 'auto'],
         default='auto',
-        help='AI agent to use: claude/c, gemini/g, qchat/q, ollama/o, auto (default: auto)'
+        help='AI agent to use: ollama/o (default), gemini/g, claude/c, acp, auto'
     )
     
     # Run command (default) - add all the run options
@@ -473,9 +472,9 @@ Examples:
         
         p.add_argument(
             "-a", "--agent",
-            choices=["claude", "q", "gemini", "ollama", "acp", "auto"],
+            choices=["ollama", "o", "gemini", "g", "claude", "c", "acp", "auto"],
             default="auto",
-            help="AI agent to use (default: auto)"
+            help="AI agent to use (default: auto; priority ollama -> gemini -> claude)"
         )
 
         p.add_argument(
@@ -622,7 +621,8 @@ Examples:
         # Collect remaining arguments for agent
         p.add_argument(
             "agent_args",
-            nargs=argparse.REMAINDER,
+            nargs="*",
+            default=[],
             help="Additional arguments to pass to the AI agent"
         )
     
@@ -662,8 +662,6 @@ Examples:
     agent_map = {
         "claude": AgentType.CLAUDE,
         "c": AgentType.CLAUDE,
-        "q": AgentType.Q,
-        "qchat": AgentType.Q,
         "gemini": AgentType.GEMINI,
         "g": AgentType.GEMINI,
         "ollama": AgentType.OLLAMA,
@@ -770,7 +768,6 @@ Examples:
         # Map CLI agent names to orchestrator tool names
         agent_name = config.agent.value if hasattr(config.agent, 'value') else str(config.agent)
         tool_name_map = {
-            "q": "qchat",
             "claude": "claude",
             "gemini": "gemini",
             "ollama": "ollama",

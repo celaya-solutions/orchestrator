@@ -189,43 +189,36 @@ class GeminiAgent(Agent):
             return False, f"Gemini execution error: {str(e)}"
 ```
 
-### Q Agent
+### Ollama Agent
 
 ```python
-class QAgent(Agent):
+class OllamaAgent(Agent):
     """
-    Q Chat AI agent implementation.
+    Local-first agent implementation powered by the Ollama CLI.
     
     Attributes:
-        max_context (int): Maximum context window (8K tokens)
+        default_model (str): Default model to run (gemma3:1b)
         timeout (int): Execution timeout in seconds
     """
     
     def __init__(self):
-        super().__init__('q', 'q')
-        self.max_context = 32000  # ~8K tokens
-        self.timeout = 300
+        super().__init__('ollama', 'ollama')
+        self.default_model = "gemma3:1b"
+        self.timeout = 600
     
     def execute(self, prompt_file: str) -> Tuple[bool, str]:
         """
-        Execute Q with prompt.
-        
-        Args:
-            prompt_file (str): Path to prompt file
-            
-        Returns:
-            tuple: (success, output)
-            
-        Example:
-            q = QAgent()
-            success, output = q.execute('PROMPT.md')
+        Execute Ollama with the given prompt file.
         """
         if not self.available:
-            return False, "Q not available"
+            return False, "Ollama not available"
         
         try:
+            with open(prompt_file, 'r') as f:
+                prompt = f.read()
             result = subprocess.run(
-                [self.command, prompt_file],
+                ["ollama", "run", self.default_model],
+                input=prompt,
                 capture_output=True,
                 text=True,
                 timeout=self.timeout
@@ -234,9 +227,9 @@ class QAgent(Agent):
             return result.returncode == 0, result.stdout
             
         except subprocess.TimeoutExpired:
-            return False, "Q execution timed out"
+            return False, "Ollama execution timed out"
         except Exception as e:
-            return False, f"Q execution error: {str(e)}"
+            return False, f"Ollama execution error: {str(e)}"
 ```
 
 ## Agent Manager
@@ -257,7 +250,7 @@ class AgentManager:
         self.agents = {
             'claude': ClaudeAgent(),
             'gemini': GeminiAgent(),
-            'q': QAgent()
+            'ollama': OllamaAgent()
         }
         self.available_agents = self.detect_available_agents()
     
@@ -317,7 +310,7 @@ class AgentManager:
         """
         Automatically select the best available agent.
         
-        Priority: claude > gemini > q
+        Priority: ollama > gemini > claude
         
         Returns:
             Agent: Best available agent
@@ -325,7 +318,7 @@ class AgentManager:
         Raises:
             RuntimeError: If no agents available
         """
-        priority = ['claude', 'gemini', 'q']
+        priority = ['ollama', 'gemini', 'claude']
         
         for agent_name in priority:
             if agent_name in self.available_agents:

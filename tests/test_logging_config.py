@@ -112,16 +112,16 @@ class TestRalphLogger:
         
         # Get different loggers
         orchestrator_logger = RalphLogger.get_logger(RalphLogger.ORCHESTRATOR)
-        qchat_logger = RalphLogger.get_logger(RalphLogger.ADAPTER_QCHAT)
+        ollama_logger = RalphLogger.get_logger(RalphLogger.ADAPTER_OLLAMA)
         
         assert orchestrator_logger.name == "ralph.orchestrator"
-        assert qchat_logger.name == "ralph.adapter.qchat"
+        assert ollama_logger.name == "ralph.adapter.ollama"
         
         # Both should inherit from ralph root logger
         assert orchestrator_logger.parent.name == "ralph"
-        # qchat logger's parent can be ralph directly if ralph.adapter doesn't exist
+        # ollama logger's parent can be ralph directly if ralph.adapter doesn't exist
         # The hierarchy depends on which loggers have been created
-        assert qchat_logger.parent.name in ["ralph", "ralph.adapter"]
+        assert ollama_logger.parent.name in ["ralph", "ralph.adapter"]
     
     def test_log_config_retrieval(self, tmp_path):
         """Test retrieving current log configuration."""
@@ -157,9 +157,9 @@ class TestRalphLogger:
         assert root_logger.level == logging.DEBUG
         
         # Change specific logger level
-        RalphLogger.set_level("ERROR", "ralph.adapter.qchat")
-        qchat_logger = logging.getLogger("ralph.adapter.qchat")
-        assert qchat_logger.level == logging.ERROR
+        RalphLogger.set_level("ERROR", "ralph.adapter.ollama")
+        ollama_logger = logging.getLogger("ralph.adapter.ollama")
+        assert ollama_logger.level == logging.ERROR
     
     def test_multiple_initialization_calls(self):
         """Test that multiple initialization calls don't duplicate handlers."""
@@ -184,7 +184,7 @@ class TestRalphLogger:
         
         # Create child logger
         parent_logger = RalphLogger.get_logger("ralph.adapter")
-        child_logger = RalphLogger.get_logger("ralph.adapter.qchat")
+        child_logger = RalphLogger.get_logger("ralph.adapter.ollama")
         
         # Child should inherit from parent
         assert child_logger.parent == parent_logger
@@ -237,47 +237,37 @@ class TestRalphLogger:
                 assert True
 
 
-class TestQChatLogging:
-    """Test logging integration with Q Chat adapter."""
+class TestOllamaLogging:
+    """Test logging integration with Ollama adapter."""
     
-    def test_qchat_adapter_logging(self):
-        """Test that Q Chat adapter uses logging correctly."""
-        from ralph_orchestrator.adapters.qchat import QChatAdapter
+    def test_ollama_adapter_logging(self):
+        """Test that Ollama adapter reports availability through logging."""
+        from ralph_orchestrator.adapters.ollama import OllamaAdapter
         
-        # Initialize logging
         RalphLogger.initialize(log_level="DEBUG")
         
-        # Mock the subprocess to avoid actually running q
         with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(returncode=1)  # q not available
+            mock_run.return_value = MagicMock(returncode=1)  # ollama not available
             
-            # Create adapter
-            adapter = QChatAdapter()
+            adapter = OllamaAdapter()
             
-            # Check that availability was logged
-            logging.getLogger(RalphLogger.ADAPTER_QCHAT)
-            
-            # Adapter should log initialization
+            logging.getLogger(RalphLogger.ADAPTER_OLLAMA)
             assert adapter.available is False
     
-    def test_qchat_configuration_from_environment(self):
-        """Test Q Chat adapter configuration from environment variables."""
-        from ralph_orchestrator.adapters.qchat import QChatAdapter
+    def test_ollama_configuration_from_environment(self):
+        """Test Ollama adapter configuration from environment variables."""
+        from ralph_orchestrator.adapters.ollama import OllamaAdapter
         
         with patch.dict(os.environ, {
-            "RALPH_QCHAT_COMMAND": "custom-q",
-            "RALPH_QCHAT_TIMEOUT": "300",
-            "RALPH_QCHAT_PROMPT_FILE": "CUSTOM.md",
-            "RALPH_QCHAT_TRUST_TOOLS": "false",
-            "RALPH_QCHAT_NO_INTERACTIVE": "false"
+            "RALPH_OLLAMA_COMMAND": "custom-ollama",
+            "RALPH_OLLAMA_TIMEOUT": "300",
+            "RALPH_OLLAMA_MODEL": "custom-model"
         }):
             with patch("subprocess.run") as mock_run:
                 mock_run.return_value = MagicMock(returncode=0)
                 
-                adapter = QChatAdapter()
+                adapter = OllamaAdapter()
                 
-                assert adapter.command == "custom-q"
+                assert adapter.command == "custom-ollama"
                 assert adapter.default_timeout == 300
-                assert adapter.default_prompt_file == "CUSTOM.md"
-                assert adapter.trust_all_tools is False
-                assert adapter.no_interactive is False
+                assert adapter.default_model == "custom-model"

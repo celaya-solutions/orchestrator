@@ -79,7 +79,7 @@ class TestCostTracker(unittest.TestCase):
         """Test adding usage for free tools."""
         tracker = CostTracker()
         
-        cost = tracker.add_usage("qchat", 10000, 5000)
+        cost = tracker.add_usage("ollama", 10000, 5000)
         
         self.assertEqual(cost, 0.0)
         self.assertEqual(tracker.total_cost, 0.0)
@@ -234,9 +234,9 @@ class TestRalphOrchestrator(unittest.TestCase):
     """Test main orchestrator."""
     
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_orchestrator_initialization(self, mock_gemini, mock_qchat, mock_claude):
+    def test_orchestrator_initialization(self, mock_gemini, mock_ollama, mock_claude):
         """Test orchestrator initialization."""
         # Mock adapters
         mock_claude_instance = MagicMock()
@@ -268,9 +268,9 @@ class TestIterationTelemetry(unittest.TestCase):
     """Test per-iteration telemetry capture in orchestrator."""
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_orchestrator_has_iteration_stats(self, mock_gemini, mock_qchat, mock_claude):
+    def test_orchestrator_has_iteration_stats(self, mock_gemini, mock_ollama, mock_claude):
         """Test orchestrator initializes iteration_stats."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -294,9 +294,9 @@ class TestIterationTelemetry(unittest.TestCase):
             Path(prompt_file).unlink()
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_determine_trigger_reason_initial(self, mock_gemini, mock_qchat, mock_claude):
+    def test_determine_trigger_reason_initial(self, mock_gemini, mock_ollama, mock_claude):
         """Test _determine_trigger_reason returns INITIAL for first iteration."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -318,9 +318,9 @@ class TestIterationTelemetry(unittest.TestCase):
             Path(prompt_file).unlink()
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_determine_trigger_reason_task_incomplete(self, mock_gemini, mock_qchat, mock_claude):
+    def test_determine_trigger_reason_task_incomplete(self, mock_gemini, mock_ollama, mock_claude):
         """Test _determine_trigger_reason returns TASK_INCOMPLETE after first iteration."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -346,9 +346,9 @@ class TestIterationTelemetry(unittest.TestCase):
             Path(prompt_file).unlink()
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_determine_trigger_reason_recovery(self, mock_gemini, mock_qchat, mock_claude):
+    def test_determine_trigger_reason_recovery(self, mock_gemini, mock_ollama, mock_claude):
         """Test _determine_trigger_reason returns RECOVERY after failures."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -375,9 +375,9 @@ class TestIterationTelemetry(unittest.TestCase):
             Path(prompt_file).unlink()
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_iteration_telemetry_disabled(self, mock_gemini, mock_qchat, mock_claude):
+    def test_iteration_telemetry_disabled(self, mock_gemini, mock_ollama, mock_claude):
         """Test orchestrator with iteration_telemetry=False."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -400,9 +400,9 @@ class TestIterationTelemetry(unittest.TestCase):
             Path(prompt_file).unlink()
 
     @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
-    @patch('ralph_orchestrator.orchestrator.QChatAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
     @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
-    def test_custom_output_preview_length(self, mock_gemini, mock_qchat, mock_claude):
+    def test_custom_output_preview_length(self, mock_gemini, mock_ollama, mock_claude):
         """Test orchestrator with custom output_preview_length."""
         mock_claude_instance = MagicMock()
         mock_claude_instance.available = True
@@ -422,6 +422,146 @@ class TestIterationTelemetry(unittest.TestCase):
             self.assertEqual(orchestrator.output_preview_length, 200)
             self.assertIsNotNone(orchestrator.iteration_stats)
             self.assertEqual(orchestrator.iteration_stats.max_preview_length, 200)
+        finally:
+            Path(prompt_file).unlink()
+
+
+class TestAutoSelection(unittest.TestCase):
+    """Tests for auto agent selection priority."""
+
+    @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
+    @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
+    def test_auto_prefers_ollama(self, mock_ollama, mock_gemini, mock_claude):
+        """Auto mode should pick Ollama first when available."""
+        mock_ollama.return_value.available = True
+        mock_gemini.return_value.available = True
+        mock_claude.return_value.available = True
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            f.write("# Test Task")
+            prompt_file = f.name
+
+        try:
+            orchestrator = RalphOrchestrator(
+                prompt_file_or_config=prompt_file,
+                primary_tool="auto",
+            )
+            self.assertEqual(orchestrator.primary_tool, "ollama")
+            self.assertTrue(orchestrator.allow_fallbacks)
+        finally:
+            Path(prompt_file).unlink()
+
+    @patch('ralph_orchestrator.orchestrator.ClaudeAdapter')
+    @patch('ralph_orchestrator.orchestrator.GeminiAdapter')
+    @patch('ralph_orchestrator.orchestrator.OllamaAdapter')
+    def test_auto_falls_back_to_gemini(self, mock_ollama, mock_gemini, mock_claude):
+        """Auto mode should fall back to Gemini when Ollama is unavailable."""
+        mock_ollama.return_value.available = False
+        mock_gemini.return_value.available = True
+        mock_claude.return_value.available = True
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            f.write("# Test Task")
+            prompt_file = f.name
+
+        try:
+            orchestrator = RalphOrchestrator(
+                prompt_file_or_config=prompt_file,
+                primary_tool="auto",
+            )
+            self.assertEqual(orchestrator.primary_tool, "gemini")
+        finally:
+            Path(prompt_file).unlink()
+
+
+class TestAutoSelectionPriority(unittest.TestCase):
+    """Test auto adapter selection priority."""
+
+    def _create_prompt(self):
+        tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False)
+        tmp.write("# Test Task")
+        tmp.flush()
+        tmp.close()
+        return tmp.name
+
+    def test_auto_prefers_ollama(self):
+        prompt_file = self._create_prompt()
+        adapters = {
+            "ollama": MagicMock(),
+            "gemini": MagicMock(),
+            "claude": MagicMock(),
+        }
+        for adapter in adapters.values():
+            adapter.available = True
+
+        try:
+            with patch.object(RalphOrchestrator, "_initialize_adapters", return_value=adapters):
+                orchestrator = RalphOrchestrator(
+                    prompt_file_or_config=prompt_file,
+                    primary_tool="auto",
+                )
+                self.assertEqual(orchestrator.current_adapter_name, "ollama")
+                self.assertIs(orchestrator.current_adapter, adapters["ollama"])
+        finally:
+            Path(prompt_file).unlink()
+
+    def test_auto_falls_back_to_gemini(self):
+        prompt_file = self._create_prompt()
+        adapters = {
+            "gemini": MagicMock(),
+            "claude": MagicMock(),
+        }
+        for adapter in adapters.values():
+            adapter.available = True
+
+        try:
+            with patch.object(RalphOrchestrator, "_initialize_adapters", return_value=adapters):
+                orchestrator = RalphOrchestrator(
+                    prompt_file_or_config=prompt_file,
+                    primary_tool="auto",
+                )
+                self.assertEqual(orchestrator.current_adapter_name, "gemini")
+                self.assertIs(orchestrator.current_adapter, adapters["gemini"])
+        finally:
+            Path(prompt_file).unlink()
+
+    def test_auto_uses_claude_last(self):
+        prompt_file = self._create_prompt()
+        adapters = {
+            "claude": MagicMock(),
+        }
+        adapters["claude"].available = True
+
+        try:
+            with patch.object(RalphOrchestrator, "_initialize_adapters", return_value=adapters):
+                orchestrator = RalphOrchestrator(
+                    prompt_file_or_config=prompt_file,
+                    primary_tool="auto",
+                )
+                self.assertEqual(orchestrator.current_adapter_name, "claude")
+                self.assertIs(orchestrator.current_adapter, adapters["claude"])
+        finally:
+            Path(prompt_file).unlink()
+
+    def test_explicit_agent_override(self):
+        prompt_file = self._create_prompt()
+        adapters = {
+            "ollama": MagicMock(),
+            "claude": MagicMock(),
+        }
+        for adapter in adapters.values():
+            adapter.available = True
+
+        try:
+            with patch.object(RalphOrchestrator, "_initialize_adapters", return_value=adapters):
+                orchestrator = RalphOrchestrator(
+                    prompt_file_or_config=prompt_file,
+                    primary_tool="claude",
+                )
+                self.assertEqual(orchestrator.current_adapter_name, "claude")
+                self.assertIs(orchestrator.current_adapter, adapters["claude"])
+                self.assertFalse(orchestrator.allow_fallbacks)
         finally:
             Path(prompt_file).unlink()
 

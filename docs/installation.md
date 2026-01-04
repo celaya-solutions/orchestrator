@@ -82,27 +82,19 @@ claude --version
 export ANTHROPIC_API_KEY="your-api-key-here"
 ```
 
-### Q Chat
+### Ollama (Local-first)
 
-Q Chat is a lightweight alternative agent.
+Ollama runs models locally. Install the daemon and pull the default model.
 
 ```bash
-# Install via pip
-pip install q-cli
-
-# Or clone from repository
-git clone https://github.com/qchat/qchat.git
-cd qchat
-python setup.py install
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Verify installation
-q --version
-```
+ollama --version
 
-**Configuration:**
-```bash
-# Configure Q Chat
-q config --set api_key="your-api-key"
+# Pull the default model once
+ollama pull gemma3:1b
 ```
 
 ### Gemini (Google)
@@ -228,7 +220,7 @@ python ralph_orchestrator.py --prompt test.md --dry-run
 ```
 Ralph Orchestrator v1.0.0
 Python 3.10.12
-Available agents: claude, q, gemini
+Available agents: ollama, gemini, claude
 Dry run completed successfully
 ```
 
@@ -368,7 +360,7 @@ ERROR: No AI agents detected
 ```bash
 npm install -g @anthropic-ai/claude-code
 # or
-pip install q-cli
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
 #### Permission Denied

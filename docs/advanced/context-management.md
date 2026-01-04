@@ -10,9 +10,9 @@ Managing context windows effectively is crucial for Ralph Orchestrator's success
 
 | Agent | Context Window | Token Limit | Approximate Characters |
 |-------|---------------|-------------|----------------------|
+| Ollama | Model-dependent | Model-dependent | Varies |
 | Claude | 200K tokens | 200,000 | ~800,000 chars |
 | Gemini | 32K tokens | 32,768 | ~130,000 chars |
-| Q Chat | 8K tokens | 8,192 | ~32,000 chars |
 
 ## Context Components
 
@@ -50,7 +50,7 @@ def estimate_context_usage(prompt_file, workspace_files):
         'percentage_used': {
             'claude': (estimated_tokens / 200000) * 100,
             'gemini': (estimated_tokens / 32768) * 100,
-            'q': (estimated_tokens / 8192) * 100
+            'ollama': (estimated_tokens / 8192) * 100
         }
     }
 ```
@@ -400,10 +400,10 @@ def recover_from_context_overflow():
 - Good for medium-sized projects
 - Optimize file inclusion
 
-### Q Chat (8K context)
-- Minimize context aggressively
-- Focus on single files/functions
-- Use for targeted tasks
+### Ollama (model-dependent context)
+- Keep prompts concise for smaller local models
+- Focus on a single file or task per iteration
+- Ensure required models are pulled and cached locally
 
 ## Configuration
 

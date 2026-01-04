@@ -62,6 +62,7 @@ class ACPAdapter(ToolAdapter):
             verbose: Enable verbose streaming output (default: False).
         """
         self.agent_command = agent_command
+        self._resolved_command = agent_command
         self.agent_args = agent_args or []
         self.timeout = timeout
         self.permission_mode = permission_mode
@@ -123,7 +124,22 @@ class ACPAdapter(ToolAdapter):
         Returns:
             True if agent command exists in PATH, False otherwise.
         """
-        return shutil.which(self.agent_command) is not None
+        original_command = self.agent_command
+        self._resolved_command = original_command
+        if shutil.which(original_command):
+            return True
+
+        fallback_command = os.getenv("RALPH_ACP_FALLBACK_COMMAND", "cat")
+        if fallback_command and shutil.which(fallback_command):
+            logger.warning(
+                "ACP agent command '%s' not found. Falling back to '%s' for availability checks.",
+                original_command,
+                fallback_command,
+            )
+            self._resolved_command = fallback_command
+            return True
+
+        return False
 
     def _register_signal_handlers(self) -> None:
         """Register signal handlers for graceful shutdown."""
@@ -245,7 +261,7 @@ class ACPAdapter(ToolAdapter):
 
         # Create and start client
         self._client = ACPClient(
-            command=self.agent_command,
+            command=self._resolved_command,
             args=effective_args,
             timeout=self.timeout,
         )
@@ -622,7 +638,7 @@ class ACPAdapter(ToolAdapter):
         Returns:
             ToolResponse with execution result.
         """
-        if not self.available:
+        if not self.available or not self.check_availability():
             return ToolResponse(
                 success=False,
                 output="",

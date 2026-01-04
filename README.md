@@ -1,6 +1,4 @@
-### NOTE: This was a toy project that was itself built with the ralph wiggum technique. Expect bugs, missing functionality, and breaking changes while I clean it up. Mainly tested with Claude Agent SDK path
-
-## 📚 Documentation
+## 📚 Readme
 
 **[View Full Documentation](https://mikeyobrien.github.io/ralph-orchestrator/)** | [Quick Start](https://mikeyobrien.github.io/ralph-orchestrator/quick-start/) | [API Reference](https://mikeyobrien.github.io/ralph-orchestrator/api/) | [Examples](https://mikeyobrien.github.io/ralph-orchestrator/examples/)
 
@@ -12,9 +10,9 @@ Based on the Ralph Wiggum technique by [Geoffrey Huntley](https://ghuntley.com/r
 
 ## ✅ Production Ready - v1.2.0
 
-- **Claude Integration**: ✅ COMPLETE (with Agent SDK)
-- **Q Chat Integration**: ✅ COMPLETE
+- **Ollama Integration**: ✅ COMPLETE (local-first, default `gemma3:1b`)
 - **Gemini Integration**: ✅ COMPLETE
+- **Claude Integration**: ✅ COMPLETE (with Agent SDK)
 - **ACP Protocol Support**: ✅ COMPLETE (Agent Client Protocol)
 - **Core Orchestration**: ✅ OPERATIONAL
 - **Test Suite**: ✅ 920+ tests passing
@@ -23,8 +21,8 @@ Based on the Ralph Wiggum technique by [Geoffrey Huntley](https://ghuntley.com/r
 
 ## Features
 
-- 🤖 **Multiple AI Agent Support**: Works with Claude, Q Chat, Gemini CLI, Ollama, and ACP-compliant agents
-- 🔍 **Auto-detection**: Automatically detects which AI agents are available
+- 🤖 **Multiple AI Agent Support**: Works with Ollama (default local), Gemini CLI, Claude, and ACP-compliant agents
+- 🔍 **Auto-detection**: Automatically detects which AI agents are available (priority: Ollama → Gemini → Claude)
 - 🌐 **WebSearch Support**: Claude can search the web for current information
 - 💾 **Checkpointing**: Git-based async checkpointing for recovery and history
 - 📚 **Prompt Archiving**: Tracks prompt evolution over iterations
@@ -56,27 +54,6 @@ python -m pip install -e .
 
 At least one AI CLI tool must be installed:
 
-- **[Claude SDK](https://pypi.org/project/claude-code-sdk/)**
-  ```bash
-  # Automatically installed via dependencies
-  # Requires ANTHROPIC_API_KEY environment variable with proper permissions:
-  # - Read/Write access to conversations
-  # - Model access (Claude 3.5 Sonnet or similar)
-  # - Sufficient rate limits for continuous operation
-  
-  export ANTHROPIC_API_KEY="sk-ant-..."
-  ```
-
-- **[Q Chat](https://github.com/qchat/qchat)**
-  ```bash
-  # Follow installation instructions in repo
-  ```
-
-- **[Gemini CLI](https://github.com/google-gemini/gemini-cli)**
-  ```bash
-  npm install -g @google/gemini-cli
-  ```
-
 - **[Ollama](https://ollama.com/)** (local models, default `gemma3:1b`)
   ```bash
   # Install Ollama
@@ -87,6 +64,22 @@ At least one AI CLI tool must be installed:
 
   # Run with Ollama (override the model if you like)
   ralph run -a ollama --ollama-model mistral:7b
+  ```
+
+- **[Gemini CLI](https://github.com/google-gemini/gemini-cli)**
+  ```bash
+  npm install -g @google/gemini-cli
+  ```
+
+- **[Claude SDK](https://pypi.org/project/claude-code-sdk/)** (paid; used after Ollama/Gemini in auto mode)
+  ```bash
+  # Automatically installed via dependencies
+  # Requires ANTHROPIC_API_KEY environment variable with proper permissions:
+  # - Read/Write access to conversations
+  # - Model access (Claude 3.5 Sonnet or similar)
+  # - Sufficient rate limits for continuous operation
+  
+  export ANTHROPIC_API_KEY="sk-ant-..."
   ```
 
 - **ACP-Compliant Agents** (Agent Client Protocol)
@@ -112,7 +105,7 @@ This creates:
 Edit `ralph.yml` to customize settings:
 ```yaml
 # Ralph Orchestrator Configuration
-agent: auto                    # Which agent to use: claude, q, gemini, ollama, acp, auto
+agent: auto                    # Which agent to use: ollama, gemini, claude, acp, auto (auto prefers ollama)
 ollama_model: gemma3:1b        # Default Ollama model
 prompt_file: PROMPT.md         # Path to prompt file
 max_iterations: 100            # Maximum iterations before stopping
@@ -121,18 +114,15 @@ verbose: false                 # Enable verbose output
 
 # Adapter configurations
 adapters:
-  claude:
-    enabled: true
-    timeout: 300              # Timeout in seconds
-  q:
+  ollama:
     enabled: true
     timeout: 300
   gemini:
     enabled: true
     timeout: 300
-  ollama:
+  claude:
     enabled: true
-    timeout: 300
+    timeout: 300              # Timeout in seconds
   acp:                        # Agent Client Protocol adapter
     enabled: true
     timeout: 300
@@ -175,7 +165,6 @@ ralph -c ralph.yml
 
 # Use specific agent
 ralph run -a claude
-ralph run -a q
 ralph run -a gemini
 ralph run -a ollama           # Local Ollama model (default gemma3:1b)
 ralph run -a acp               # ACP-compliant agent
@@ -204,7 +193,7 @@ Commands:
 
 Core Options:
   -c, --config CONFIG             Configuration file (YAML format)
-  -a, --agent {claude,q,gemini,acp,auto}  AI agent to use (default: auto)
+  -a, --agent {ollama,gemini,claude,acp,auto}  AI agent to use (default: auto)
   -P, --prompt-file FILE          Prompt file path (default: PROMPT.md)
   -p, --prompt-text TEXT          Inline prompt text (overrides file)
   -i, --max-iterations N          Maximum iterations (default: 100)
@@ -225,6 +214,35 @@ Advanced Options:
   --no-archive                    Disable prompt archiving
   --no-metrics                    Disable metrics collection
 ```
+
+## CustomGPT Actions Server (experimental)
+
+- **Run locally:** `export RALPH_ACTIONS_API_KEY=<secret>` (optional) then start `uvicorn ralph_orchestrator.web.actions_server:app --host 0.0.0.0 --port 8081` or `python -m ralph_orchestrator.web.actions_server`.
+- **Health check:** `curl http://localhost:8081/healthz` (add `-H "x-api-key: <secret>"` if set).
+- **Start a run (file-driven):**
+  ```bash
+  curl -X POST http://localhost:8081/runs \
+    -H "Content-Type: application/json" \
+    -H "x-api-key: <secret>" \
+    -d '{
+      "prompt_file": "/workspace/PROMPT.md",
+      "config": { "agent": "auto", "max_iterations": 5 }
+    }'
+  ```
+  Response includes `status_url` for polling with `GET /runs/{run_id}`; cancel with `DELETE /runs/{run_id}`; list with `GET /runs`.
+- **Fly.io hint:** Use the existing `Dockerfile`, set `RALPH_ACTIONS_PORT=8080` and `RALPH_ACTIONS_API_KEY`, and run `python -m ralph_orchestrator.web.actions_server --host 0.0.0.0 --port 8080` as the Fly process with `internal_port = 8080`.
+- **Test deployment (Docker):**
+  ```bash
+  docker build -t ralph-actions .
+  docker run --rm -p 8081:8081 \
+    -e RALPH_ACTIONS_API_KEY=secret \
+    -e RALPH_ACTIONS_PORT=8081 \
+    ralph-actions python -m ralph_orchestrator.web.actions_server --host 0.0.0.0 --port 8081
+  ```
+- **Generate OpenAPI for CustomGPT actions:** after the server is running, export `openapi.json` for upload into the GPT Action configuration:
+  ```bash
+  curl -H "x-api-key: <secret>" http://localhost:8081/openapi.json -o customgpt-actions-openapi.json
+  ```
 
 ## ACP (Agent Client Protocol) Integration
 
@@ -323,7 +341,7 @@ The ACP adapter handles these agent requests:
 ### Execution Flow
 
 1. **Initialization**: Creates `.agent/` directories and validates prompt file
-2. **Agent Detection**: Auto-detects available AI agents (claude, q, gemini)
+2. **Agent Detection**: Auto-detects available AI agents (ollama, gemini, claude)
 3. **Iteration Loop**: 
    - Executes AI agent with current prompt
    - Monitors for task completion marker
@@ -348,7 +366,7 @@ ralph-orchestrator/
 │       │   ├── base.py      # Base adapter interface
 │       │   ├── claude.py    # Claude Agent SDK adapter
 │       │   ├── gemini.py    # Gemini CLI adapter
-│       │   ├── qchat.py     # Q Chat adapter
+│       │   ├── ollama.py    # Ollama adapter
 │       │   ├── acp.py       # ACP (Agent Client Protocol) adapter
 │       │   ├── acp_protocol.py  # JSON-RPC 2.0 protocol handling
 │       │   ├── acp_client.py    # Subprocess manager
@@ -455,7 +473,7 @@ Implement a linked list in Python using TDD:
 4. Ensure 100% test coverage
 EOF
 
-ralph run -a q --verbose
+ralph run -a ollama --verbose
 ```
 
 ## Monitoring
@@ -533,7 +551,7 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 # - Requires read/write access to the API
 
 # For Q and Gemini, check CLI tools are installed
-which q
+which ollama
 which gemini
 
 # Install missing CLI tools as needed

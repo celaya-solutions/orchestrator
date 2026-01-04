@@ -32,8 +32,8 @@ DEFAULT_OLLAMA_MODEL = "gemma3:1b"
 # Token costs per million (approximate)
 TOKEN_COSTS = {
     "claude": {"input": 3.0, "output": 15.0},  # Claude 3.5 Sonnet
-    "q": {"input": 0.5, "output": 1.5},  # Estimated
-    "gemini": {"input": 0.5, "output": 1.5}  # Gemini Pro
+    "gemini": {"input": 0.5, "output": 1.5},  # Gemini Pro
+    "ollama": {"input": 0.0, "output": 0.0},  # Local-first, treated as free
 }
 
 # Setup logging
@@ -49,7 +49,6 @@ logger = logging.getLogger('ralph-orchestrator')
 class AgentType(Enum):
     """Supported AI agent types"""
     CLAUDE = "claude"
-    Q = "q"
     GEMINI = "gemini"
     OLLAMA = "ollama"
     ACP = "acp"
@@ -410,7 +409,7 @@ def main():
     parser.add_argument(
         "--agent", "-a",
         type=str,
-        choices=["claude", "q", "gemini", "acp", "auto"],
+        choices=["claude", "gemini", "ollama", "acp", "auto"],
         default="auto",
         help="AI agent to use (default: auto-detect)"
     )

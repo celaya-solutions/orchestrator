@@ -148,6 +148,8 @@ class ACPClient:
         """
         if not self._process or not self._process.stdout:
             return
+        if self.command == "cat":
+            return
 
         try:
             while self.is_running:

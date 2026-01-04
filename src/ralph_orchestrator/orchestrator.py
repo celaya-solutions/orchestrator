@@ -14,7 +14,6 @@ from datetime import datetime
 
 from .adapters.base import ToolAdapter
 from .adapters.claude import ClaudeAdapter
-from .adapters.qchat import QChatAdapter
 from .adapters.gemini import GeminiAdapter
 from .adapters.ollama import OllamaAdapter
 from .adapters.acp import ACPAdapter
@@ -55,7 +54,7 @@ class RalphOrchestrator:
 
         Args:
             prompt_file_or_config: Path to prompt file or RalphConfig object
-            primary_tool: Primary AI tool to use (claude, qchat, gemini)
+            primary_tool: Primary AI tool to use (claude, gemini, ollama, acp, auto)
             max_iterations: Maximum number of iterations
             max_runtime: Maximum runtime in seconds
             track_costs: Whether to track costs
@@ -105,8 +104,8 @@ class RalphOrchestrator:
             self.output_preview_length = output_preview_length
             self.ollama_model = ollama_model
 
-        # Allow fallback only when using auto selection
-        self.allow_fallbacks = self.primary_tool == "auto"
+        # Track requested vs resolved adapter names
+        self.requested_tool = self.primary_tool
 
         # Initialize components
         self.metrics = Metrics()
@@ -120,11 +119,11 @@ class RalphOrchestrator:
         
         # Initialize adapters
         self.adapters = self._initialize_adapters()
-        self.current_adapter = self.adapters.get(self.primary_tool)
-        
-        if not self.current_adapter:
-            logger.error(f"DEBUG: primary_tool={self.primary_tool}, adapters={list(self.adapters.keys())}")
-            raise ValueError(f"Unknown tool: {self.primary_tool}")
+        self.current_adapter_name, self.current_adapter = self._select_adapter(self.primary_tool)
+        # Update primary_tool to the resolved adapter for downstream reporting
+        self.primary_tool = self.current_adapter_name
+        # Allow fallback only when using auto selection
+        self.allow_fallbacks = self.requested_tool == "auto"
         
         # Signal handling - use basic signal registration here
         # The async handlers will be set up when arun() is called
@@ -149,66 +148,65 @@ class RalphOrchestrator:
     
     def _initialize_adapters(self) -> Dict[str, ToolAdapter]:
         """Initialize available adapters."""
-        adapters = {}
+        adapters: Dict[str, ToolAdapter] = {}
 
-        # Try to initialize each adapter
-        try:
-            adapter = ClaudeAdapter(verbose=self.verbose)
-            if adapter.available:
-                adapters['claude'] = adapter
-                logger.info("Claude adapter initialized")
-            else:
-                logger.warning("Claude SDK not available")
-        except Exception as e:
-            logger.warning(f"Claude adapter error: {e}")
+        def _add_adapter(name: str, factory):
+            try:
+                adapter = factory()
+                if adapter.available:
+                    adapters[name] = adapter
+                    logger.info("%s adapter initialized", name.capitalize())
+                else:
+                    logger.warning("%s adapter not available", name.capitalize())
+            except Exception as e:  # pragma: no cover - defensive logging
+                logger.warning("%s adapter error: %s", name.capitalize(), e)
 
-        try:
-            adapter = QChatAdapter()
-            if adapter.available:
-                adapters['qchat'] = adapter
-                logger.info("Q Chat adapter initialized")
-            else:
-                logger.warning("Q Chat CLI not available")
-        except Exception as e:
-            logger.warning(f"Q Chat adapter error: {e}")
+        # Priority order: ollama (local), gemini, claude (paid), acp
+        _add_adapter("ollama", lambda: OllamaAdapter(default_model=self.ollama_model))
+        _add_adapter("gemini", GeminiAdapter)
+        _add_adapter("claude", lambda: ClaudeAdapter(verbose=self.verbose))
 
-        try:
-            adapter = OllamaAdapter(default_model=self.ollama_model)
-            if adapter.available:
-                adapters['ollama'] = adapter
-                logger.info(f"Ollama adapter initialized (default model: {adapter.default_model})")
-            else:
-                logger.warning("Ollama CLI not available")
-        except Exception as e:
-            logger.warning(f"Ollama adapter error: {e}")
-
-        try:
-            adapter = GeminiAdapter()
-            if adapter.available:
-                adapters['gemini'] = adapter
-                logger.info("Gemini adapter initialized")
-            else:
-                logger.warning("Gemini CLI not available")
-        except Exception as e:
-            logger.warning(f"Gemini adapter error: {e}")
-
-        # Initialize ACP adapter with CLI parameters
-        try:
+        # Initialize ACP adapter with CLI parameters (kept out of auto priority)
+        def _acp_factory():
             acp_kwargs = {}
             if self.acp_agent:
-                acp_kwargs['agent_command'] = self.acp_agent
+                acp_kwargs["agent_command"] = self.acp_agent
             if self.acp_permission_mode:
-                acp_kwargs['permission_mode'] = self.acp_permission_mode
-            adapter = ACPAdapter(**acp_kwargs)
-            if adapter.available:
-                adapters['acp'] = adapter
-                logger.info(f"ACP adapter initialized (agent: {adapter.agent_command})")
-            else:
-                logger.warning("ACP agent not available")
-        except Exception as e:
-            logger.warning(f"ACP adapter error: {e}")
+                acp_kwargs["permission_mode"] = self.acp_permission_mode
+            return ACPAdapter(**acp_kwargs)
+
+        _add_adapter("acp", _acp_factory)
 
         return adapters
+
+    def _select_adapter(self, primary_tool: str) -> tuple[str, ToolAdapter]:
+        """Select the adapter based on priority or explicit choice."""
+        if primary_tool != "auto":
+            adapter = self.adapters.get(primary_tool)
+            if not adapter:
+                logger.error("Unknown or unavailable tool requested: %s", primary_tool)
+                raise ValueError(f"Unknown tool: {primary_tool}")
+            return primary_tool, adapter
+
+        # Auto selection prefers local-first, then paid last
+        for name in self._get_adapter_priority():
+            adapter = self.adapters.get(name)
+            if adapter:
+                logger.info("Auto-selected %s adapter", name)
+                return name, adapter
+
+        raise ValueError(
+            "No AI adapters available. Install Ollama or configure a supported agent."
+        )
+
+    def _get_adapter_priority(self) -> list[str]:
+        """Return ordered list of adapter names based on desired priority."""
+        priority = ["ollama", "gemini", "claude", "acp"]
+        # Preserve insertion for any additional adapters
+        for name in self.adapters:
+            if name not in priority:
+                priority.append(name)
+        return priority
     
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals with subprocess-first cleanup.
@@ -496,24 +494,26 @@ class RalphOrchestrator:
             return False
 
         if not response.success and self.allow_fallbacks and len(self.adapters) > 1 and not self.stop_requested:
-            # Try fallback adapters (skip if shutdown requested)
-            for name, adapter in self.adapters.items():
-                if self.stop_requested:
+            # Try fallback adapters (skip if shutdown requested) in priority order
+            for name in self._get_adapter_priority():
+                adapter = self.adapters.get(name)
+                if not adapter or adapter == self.current_adapter or self.stop_requested:
+                    continue
+                fallback_kwargs = {
+                    "prompt_file": str(self.prompt_file),
+                    "verbose": self.verbose
+                }
+                if isinstance(adapter, OllamaAdapter):
+                    fallback_kwargs["model"] = self.ollama_model
+                logger.info("Falling back to %s", name)
+                response = await adapter.aexecute(
+                    prompt,
+                    **fallback_kwargs
+                )
+                if response.success:
+                    self.current_adapter = adapter
+                    self.current_adapter_name = name
                     break
-                if adapter != self.current_adapter:
-                    fallback_kwargs = {
-                        "prompt_file": str(self.prompt_file),
-                        "verbose": self.verbose
-                    }
-                    if isinstance(adapter, OllamaAdapter):
-                        fallback_kwargs["model"] = self.ollama_model
-                    logger.info(f"Falling back to {name}")
-                    response = await adapter.aexecute(
-                        prompt,
-                        **fallback_kwargs
-                    )
-                    if response.success:
-                        break
         
         # Store and log the response output (already streamed to console if verbose)
         if response.success and response.output:

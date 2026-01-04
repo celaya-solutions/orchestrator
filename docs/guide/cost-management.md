@@ -10,8 +10,8 @@ Current pricing per million tokens:
 
 | Agent | Input Cost | Output Cost | Avg Cost/Task |
 |-------|------------|-------------|---------------|
+| **Ollama** | $0.00 | $0.00 | Local/free |
 | **Claude** | $3.00 | $15.00 | $5-50 |
-| **Q Chat** | $0.50 | $1.50 | $1-10 |
 | **Gemini** | $0.50 | $1.50 | $1-10 |
 
 ### Cost Calculation
@@ -24,7 +24,7 @@ total_cost = (input_tokens / 1_000_000 * input_price) +
 **Example:**
 - Task uses 100K input tokens, 50K output tokens
 - With Claude: (0.1 × $3) + (0.05 × $15) = $1.05
-- With Q Chat: (0.1 × $0.50) + (0.05 × $1.50) = $0.125
+- With Ollama: Local execution (no incremental token cost)
 
 ## Cost Control Mechanisms
 
@@ -57,7 +57,7 @@ Choose cost-effective agents:
 
 ```bash
 # Development: Use cheaper agents
-python ralph_orchestrator.py --agent q --max-cost 5.0
+python ralph_orchestrator.py --agent ollama --max-cost 0.0
 
 # Production: Use quality agents with limits
 python ralph_orchestrator.py --agent claude --max-cost 50.0
@@ -70,17 +70,17 @@ python ralph_orchestrator.py --agent claude --max-cost 50.0
 Use different agents for different task phases:
 
 ```bash
-# Phase 1: Research with Q (cheap)
+# Phase 1: Research with Ollama (local/free)
 echo "Research the problem" > research.md
-python ralph_orchestrator.py --agent q --prompt research.md --max-cost 2.0
+python ralph_orchestrator.py --agent ollama --prompt research.md --max-cost 0.0
 
 # Phase 2: Implementation with Claude (quality)
 echo "Implement the solution" > implement.md
 python ralph_orchestrator.py --agent claude --prompt implement.md --max-cost 20.0
 
-# Phase 3: Testing with Q (cheap)
+# Phase 3: Testing with Ollama (local/free)
 echo "Test the solution" > test.md
-python ralph_orchestrator.py --agent q --prompt test.md --max-cost 2.0
+python ralph_orchestrator.py --agent ollama --prompt test.md --max-cost 0.0
 ```
 
 ### 2. Prompt Optimization
@@ -211,11 +211,11 @@ plt.savefig('cost_report.png')
 
 | Task Type | Complexity | Recommended Budget | Agent |
 |-----------|------------|-------------------|--------|
-| Simple Script | Low | $0.50 - $2 | Q Chat |
+| Simple Script | Low | Local | Ollama |
 | Web API | Medium | $5 - $20 | Gemini/Claude |
 | Full Application | High | $20 - $100 | Claude |
 | Data Analysis | Medium | $5 - $15 | Gemini |
-| Documentation | Low-Medium | $2 - $10 | Q/Claude |
+| Documentation | Low-Medium | $0 - $10 | Ollama/Claude |
 | Debugging | Variable | $5 - $50 | Claude |
 
 ### Monthly Budget Planning
@@ -238,9 +238,9 @@ Maximum savings, acceptable quality:
 
 ```bash
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-tokens 50000 \
-  --max-cost 2.0 \
+  --max-cost 0.0 \
   --context-window 30000 \
   --context-threshold 0.5 \
   --checkpoint-interval 10
@@ -287,7 +287,7 @@ if remaining_budget > 20:
 elif remaining_budget > 5:
     agent = "gemini"
 else:
-    agent = "q"
+    agent = "ollama"
 ```
 
 ### Cost-Aware Prompts

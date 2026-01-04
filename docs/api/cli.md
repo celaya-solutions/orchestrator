@@ -88,7 +88,7 @@ Examples:
         )
         run_parser.add_argument(
             '--agent', '-a',
-            choices=['claude', 'q', 'gemini', 'acp', 'auto'],
+            choices=['ollama', 'gemini', 'claude', 'acp', 'auto'],
             default='auto',
             help='AI agent to use'
         )
@@ -494,7 +494,7 @@ _ralph_completion() {
             return 0
             ;;
         --agent|-a)
-            COMPREPLY=( $(compgen -W "claude q gemini acp auto" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "ollama gemini claude acp auto" -- ${cur}) )
             return 0
             ;;
         --acp-agent)
@@ -563,7 +563,7 @@ _ralph() {
             case $words[1] in
                 run)
                     _arguments \
-                        '--agent[AI agent]:agent:(claude q gemini acp auto)' \
+                        '--agent[AI agent]:agent:(ollama gemini claude acp auto)' \
                         '--prompt[Prompt file]:file:_files -g "*.md"' \
                         '--max-iterations[Max iterations]:number' \
                         '--acp-agent[ACP agent command]:command' \

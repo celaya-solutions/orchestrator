@@ -340,7 +340,7 @@ def calculate_costs():
     costs = {
         'claude': 0.01,    # $ per call
         'gemini': 0.005,   # $ per call
-        'q': 0.0           # Free
+        'ollama': 0.0      # Free/local
     }
 
     total_cost = 0
@@ -415,7 +415,7 @@ def health_check():
         health['checks'].append('PROMPT.md missing')
 
     # Check agent availability
-    for agent in ['claude', 'q', 'gemini']:
+    for agent in ['ollama', 'gemini', 'claude']:
         if shutil.which(agent):
             health['checks'].append(f'{agent}: available')
         else:

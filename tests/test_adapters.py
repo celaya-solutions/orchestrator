@@ -8,8 +8,8 @@ from unittest.mock import patch, MagicMock
 
 from ralph_orchestrator.adapters.base import ToolAdapter, ToolResponse
 from ralph_orchestrator.adapters.claude import ClaudeAdapter
-from ralph_orchestrator.adapters.qchat import QChatAdapter
 from ralph_orchestrator.adapters.gemini import GeminiAdapter
+from ralph_orchestrator.adapters.ollama import OllamaAdapter
 
 
 class TestToolResponse(unittest.TestCase):
@@ -106,69 +106,28 @@ class TestClaudeAdapter(unittest.TestCase):
         self.assertEqual(adapter._disallowed_tools, ["Bash"])
 
 
-class TestQChatAdapter(unittest.TestCase):
-    """Test Q Chat adapter."""
-    
+class TestOllamaAdapter(unittest.TestCase):
+    """Test Ollama adapter."""
+
     @patch('subprocess.run')
     def test_check_availability_success(self, mock_run):
-        """Test Q Chat availability check when available."""
+        """Test Ollama availability check when available."""
         mock_run.return_value = MagicMock(returncode=0)
-        
-        QChatAdapter()
-        # Note: availability check uses 'which q'
+
+        adapter = OllamaAdapter()
+        self.assertTrue(adapter.available)
         mock_run.assert_called_with(
-            ["which", "q"],
+            [adapter.command, "--version"],
             capture_output=True,
             timeout=5,
-            text=True
+            text=True,
         )
-    
-    @patch('subprocess.run')
-    @patch('subprocess.Popen')
-    def test_execute_success(self, mock_popen, mock_run):
-        """Test successful Q Chat execution."""
-        mock_run.return_value = MagicMock(returncode=0)  # availability check
-        
-        # Mock the Popen process with proper file descriptor support
-        mock_process = MagicMock()
-        # poll() should return None while running, then 0 when complete
-        # We need enough None values for the reading phase, then 0 for completion
-        # and finally 0 again for the returncode check
-        poll_returns = [None, None, 0, 0]  # Extra 0 for final returncode check
-        mock_process.poll.side_effect = poll_returns
-        
-        # Mock stdout and stderr with fileno() support
-        mock_stdout = MagicMock()
-        mock_stdout.fileno.return_value = 3  # Valid file descriptor
-        # The _read_available method will be called multiple times
-        # Return data on first read, then empty strings
-        # Also need a value for the final read when process completes
-        mock_stdout.read.side_effect = ["Q Chat response", "", "", "", ""]
-        
-        mock_stderr = MagicMock()
-        mock_stderr.fileno.return_value = 4  # Valid file descriptor
-        mock_stderr.read.side_effect = ["", "", "", "", ""]
-        
-        mock_process.stdout = mock_stdout
-        mock_process.stderr = mock_stderr
-        mock_popen.return_value = mock_process
-        
-        adapter = QChatAdapter()
-        response = adapter.execute("Test prompt")
-        
-        # Debug output to understand the failure
-        if not response.success:
-            print(f"Response failed with error: {response.error}")
-            print(f"Response output: {response.output}")
-        
-        self.assertTrue(response.success)
-        self.assertEqual(response.output, "Q Chat response")
-    
-    def test_estimate_cost(self):
-        """Test Q Chat cost estimation (should be free)."""
-        adapter = QChatAdapter()
-        cost = adapter.estimate_cost("Any prompt")
-        self.assertEqual(cost, 0.0)
+
+    @patch('subprocess.run', side_effect=FileNotFoundError)
+    def test_check_availability_missing_binary(self, mock_run):
+        """Test Ollama availability check when binary is missing."""
+        adapter = OllamaAdapter()
+        self.assertFalse(adapter.available)
 
 
 class TestGeminiAdapter(unittest.TestCase):

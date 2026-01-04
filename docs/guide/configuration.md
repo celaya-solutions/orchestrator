@@ -32,7 +32,7 @@ Configuration file support is planned for future releases.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `--agent` | `auto` | AI agent to use: `claude`, `q`, `gemini`, `acp`, or `auto` |
+| `--agent` | `auto` | AI agent to use: `ollama`, `gemini`, `claude`, `acp`, or `auto` |
 | `--agent-args` | None | Additional arguments to pass to the agent |
 | `--acp-agent` | `gemini` | ACP agent command (for `-a acp`) |
 | `--acp-permission-mode` | `auto_approve` | Permission handling: `auto_approve`, `deny_all`, `allowlist`, `interactive` |
@@ -256,9 +256,9 @@ For local development and testing:
 
 ```bash
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-iterations 10 \
-  --max-cost 1.0 \
+  --max-cost 0.0 \
   --verbose \
   --checkpoint-interval 1 \
   --metrics-interval 1
@@ -285,9 +285,9 @@ For cost-sensitive operations:
 
 ```bash
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-tokens 50000 \
-  --max-cost 2.0 \
+  --max-cost 0.0 \
   --context-window 50000 \
   --context-threshold 0.7
 ```

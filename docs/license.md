@@ -94,10 +94,10 @@ Ralph Orchestrator integrates with the following AI agent CLI tools, which have 
 - **License**: See Gemini CLI documentation
 - **URL**: https://github.com/google-gemini/gemini-cli
 
-### Q Chat
-- **Provider**: Q Chat Team
-- **License**: See Q Chat documentation
-- **URL**: https://github.com/qchat/qchat
+### Ollama
+- **Provider**: Ollama
+- **License**: See Ollama documentation
+- **URL**: https://ollama.com
 
 ## Documentation License
 

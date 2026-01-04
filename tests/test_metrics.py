@@ -72,7 +72,7 @@ class TestCostTracker:
         assert tracker.total_cost == cost
 
     def test_unknown_tool_defaults_to_free(self):
-        """Test unknown tool defaults to qchat (free)."""
+        """Test unknown tool defaults to ollama (free)."""
         tracker = CostTracker()
         cost = tracker.add_usage("unknown_tool", 1000, 1000)
         assert cost == 0.0

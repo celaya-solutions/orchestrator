@@ -292,7 +292,7 @@ image:
 apiKeys:
   claude: ""
   gemini: ""
-  q: ""
+  ollama: ""
 
 config:
   agent: "auto"

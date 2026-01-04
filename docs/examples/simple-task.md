@@ -121,7 +121,7 @@ python ralph_orchestrator.py --prompt todo-prompt.md
 ```bash
 # Budget-conscious approach
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --prompt todo-prompt.md \
   --max-cost 2.0 \
   --max-iterations 20
@@ -142,7 +142,7 @@ Typical completion: 5-15 iterations
 
 ### Cost Estimates
 
-- **Q Chat**: $0.50 - $1.50
+- **Ollama**: Local execution (no per-token cost)
 - **Gemini**: $0.75 - $2.00
 - **Claude**: $2.00 - $5.00
 

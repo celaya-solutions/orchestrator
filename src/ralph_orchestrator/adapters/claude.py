@@ -5,6 +5,7 @@
 """Claude SDK adapter for Ralph Orchestrator."""
 
 import asyncio
+import inspect
 import logging
 import os
 import signal
@@ -246,8 +247,14 @@ class ClaudeAdapter(ToolAdapter):
             if self.verbose:
                 logger.debug(f"Using model: {model}")
 
+            # Create options (filter for compatibility with installed SDK)
+            valid_params = inspect.signature(ClaudeAgentOptions.__init__).parameters
+            filtered_options = {
+                key: value for key, value in options_dict.items() if key in valid_params
+            }
+
             # Create options
-            options = ClaudeAgentOptions(**options_dict)
+            options = ClaudeAgentOptions(**filtered_options)
             
             # Log request details if verbose
             if self.verbose:

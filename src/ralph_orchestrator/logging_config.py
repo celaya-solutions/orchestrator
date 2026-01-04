@@ -17,7 +17,6 @@ class RalphLogger:
     # Logger names for different components
     ORCHESTRATOR = "ralph.orchestrator"
     ADAPTER_BASE = "ralph.adapter"
-    ADAPTER_QCHAT = "ralph.adapter.qchat"
     ADAPTER_CLAUDE = "ralph.adapter.claude"
     ADAPTER_GEMINI = "ralph.adapter.gemini"
     ADAPTER_OLLAMA = "ralph.adapter.ollama"

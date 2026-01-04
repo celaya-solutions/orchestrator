@@ -18,7 +18,7 @@ class TestACPAgentChoice:
         parser = argparse.ArgumentParser()
         parser.add_argument(
             "-a", "--agent",
-            choices=["claude", "q", "gemini", "acp", "auto"],
+            choices=["claude", "gemini", "ollama", "acp", "auto"],
             default="auto"
         )
 
@@ -83,10 +83,10 @@ class TestACPAdapterMap:
         agent_map = {
             "claude": AgentType.CLAUDE,
             "c": AgentType.CLAUDE,
-            "q": AgentType.Q,
-            "qchat": AgentType.Q,
             "gemini": AgentType.GEMINI,
             "g": AgentType.GEMINI,
+            "ollama": AgentType.OLLAMA,
+            "o": AgentType.OLLAMA,
             "acp": AgentType.ACP,
             "auto": AgentType.AUTO
         }
@@ -97,9 +97,9 @@ class TestACPAdapterMap:
     def test_tool_name_map_includes_acp(self):
         """Test that tool_name_map includes 'acp' mapping."""
         tool_name_map = {
-            "q": "qchat",
             "claude": "claude",
             "gemini": "gemini",
+            "ollama": "ollama",
             "acp": "acp",
             "auto": "auto"
         }
@@ -118,12 +118,12 @@ class TestOrchestratorACPAdapter:
 
         with patch.object(ACPAdapter, 'check_availability', return_value=True):
             with patch('ralph_orchestrator.orchestrator.ClaudeAdapter') as mock_claude:
-                with patch('ralph_orchestrator.orchestrator.QChatAdapter') as mock_qchat:
+                with patch('ralph_orchestrator.orchestrator.OllamaAdapter') as mock_ollama:
                     with patch('ralph_orchestrator.orchestrator.GeminiAdapter') as mock_gemini:
                         with patch('ralph_orchestrator.orchestrator.ACPAdapter') as mock_acp:
                             # Mock all adapters as available
                             mock_claude.return_value.available = True
-                            mock_qchat.return_value.available = True
+                            mock_ollama.return_value.available = True
                             mock_gemini.return_value.available = True
                             mock_acp.return_value.available = True
 
@@ -166,13 +166,13 @@ class TestOrchestratorACPAdapter:
         from ralph_orchestrator.orchestrator import RalphOrchestrator
 
         with patch('ralph_orchestrator.orchestrator.ClaudeAdapter') as mock_claude, \
-             patch('ralph_orchestrator.orchestrator.QChatAdapter') as mock_qchat, \
+             patch('ralph_orchestrator.orchestrator.OllamaAdapter') as mock_ollama, \
              patch('ralph_orchestrator.orchestrator.GeminiAdapter') as mock_gemini, \
              patch('ralph_orchestrator.orchestrator.ACPAdapter') as mock_acp:
 
             # Make all adapters unavailable except ACP
             mock_claude.return_value.available = False
-            mock_qchat.return_value.available = False
+            mock_ollama.return_value.available = False
             mock_gemini.return_value.available = False
             mock_acp.return_value.available = True
 

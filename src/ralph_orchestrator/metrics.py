@@ -80,7 +80,7 @@ class CostTracker:
             "input": 0.00025,  # $0.25 per 1M input tokens
             "output": 0.001    # $1 per 1M output tokens
         },
-        "qchat": {
+        "ollama": {
             "input": 0.0,      # Free/local
             "output": 0.0
         },
@@ -120,7 +120,7 @@ class CostTracker:
             Cost for this usage
         """
         if tool not in self.COSTS:
-            tool = "qchat"  # Default to free tier
+            tool = "ollama"  # Default to local/free tier
         
         costs = self.COSTS[tool]
         input_cost = (input_tokens / 1000) * costs["input"]

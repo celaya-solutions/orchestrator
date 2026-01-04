@@ -36,53 +36,38 @@ python ralph_orchestrator.py --agent claude
 - Input: $3.00 per million tokens
 - Output: $15.00 per million tokens
 
-### Q Chat
+### Ollama (Local)
 
-Q Chat is a cost-effective AI assistant suitable for many general tasks, now with production-ready adapter implementation.
+Ollama is the default, local-first adapter for Ralph. It keeps execution on your machine and avoids paid APIs unless explicitly requested.
 
 **Strengths:**
-- Good general-purpose capabilities
-- Fast response times with streaming support
-- Cost-effective for simple tasks
-- Reliable for straightforward operations
-- Thread-safe concurrent message processing
-- Robust error handling and recovery
-- Graceful shutdown and resource cleanup
+- Runs locally with zero API cost
+- Fast startup with deterministic logging of stdout/stderr
+- Works offline once models are downloaded
+- Minimal configuration: `ollama pull gemma3:1b` and go
 
 **Best For:**
-- Simple coding tasks
-- Basic documentation
-- Data processing
-- Quick prototypes
-- Budget-conscious operations
-- High-concurrency workloads
-- Long-running batch processes
+- Most day-to-day development tasks
+- Privacy-sensitive work (no remote API calls)
+- Air-gapped or constrained environments
+- Rapid prototyping without billing surprises
 
 **Installation:**
 ```bash
-pip install q-cli
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull gemma3:1b
 ```
 
 **Usage:**
 ```bash
-python ralph_orchestrator.py --agent q
+python ralph_orchestrator.py --agent ollama
 
 # Short form
-python ralph_orchestrator.py -a q
+python ralph_orchestrator.py -a o
 ```
 
-**Production Features:**
-- **Message Queue**: Thread-safe async message processing
-- **Error Recovery**: Automatic retry with exponential backoff
-- **Signal Handling**: Graceful shutdown on SIGINT/SIGTERM
-- **Resource Management**: Proper cleanup of processes and threads
-- **Timeout Handling**: Configurable timeouts with partial output preservation
-- **Non-blocking I/O**: Prevents deadlocks in pipe communication
-- **Concurrent Processing**: Handles multiple requests simultaneously
-
 **Cost:**
-- Input: $0.50 per million tokens (estimated)
-- Output: $1.50 per million tokens (estimated)
+- Local execution (no per-token cost)
 
 ### Gemini (Google)
 
@@ -214,25 +199,25 @@ Ralph Orchestrator can automatically detect and use available agents:
 python ralph_orchestrator.py --agent auto
 ```
 
-**Detection Order:**
-1. Claude (if installed)
-2. Q Chat (if installed)
-3. Gemini (if installed)
+**Detection Order (auto mode):**
+1. Ollama (if installed)
+2. Gemini (if installed)
+3. Claude (paid; if installed)
 
 ## Agent Comparison
 
-| Feature | Claude | Q Chat | Gemini | ACP |
-|---------|--------|--------|---------|-----|
-| **Context Window** | 200K | 100K | 128K | Varies |
-| **Code Quality** | Excellent | Good | Very Good | Varies |
-| **Documentation** | Excellent | Good | Good | Varies |
-| **Speed** | Moderate | Fast | Fast | Varies |
-| **Cost** | High | Low | Low | Agent-dependent |
-| **Reasoning** | Excellent | Good | Very Good | Varies |
-| **Creativity** | Excellent | Good | Good | Varies |
-| **Math/Data** | Very Good | Good | Excellent | Varies |
+| Feature | Ollama | Gemini | Claude | ACP |
+|---------|--------|--------|--------|-----|
+| **Context Window** | Model-dependent | 128K | 200K | Varies |
+| **Code Quality** | Good (local model) | Very Good | Excellent | Varies |
+| **Documentation** | Good | Good | Excellent | Varies |
+| **Speed** | Fast (local) | Fast | Moderate | Varies |
+| **Cost** | Local/free | Low | High | Agent-dependent |
+| **Reasoning** | Good | Very Good | Excellent | Varies |
+| **Creativity** | Good | Good | Excellent | Varies |
+| **Math/Data** | Good | Excellent | Very Good | Varies |
 | **Permission Control** | Basic | Basic | Basic | **4 modes** |
-| **Protocol** | SDK | CLI | CLI | JSON-RPC 2.0 |
+| **Protocol** | CLI (local) | CLI | SDK | JSON-RPC 2.0 |
 
 ## Choosing the Right Agent
 
@@ -242,16 +227,14 @@ python ralph_orchestrator.py --agent auto
 graph TD
     A[Select Agent] --> B{Task Type?}
     B -->|Complex Code| C[Claude]
-    B -->|Simple Task| D{Budget?}
+    B -->|Local/Offline| D[Ollama]
     B -->|Data Analysis| E[Gemini]
     B -->|Sandboxed/CI| K{Need Control?}
-    D -->|Limited| F[Q Chat]
-    D -->|Flexible| G[Claude/Gemini]
     B -->|Documentation| H{Quality Need?}
-    H -->|High| I[Claude]
-    H -->|Standard| J[Q Chat/Gemini]
+    H -->|High| C
+    H -->|Standard| D
     K -->|Yes| L[ACP]
-    K -->|No| M[Any Agent]
+    K -->|No| M[Ollama/Gemini]
 ```
 
 ### Task-Agent Mapping
@@ -259,14 +242,14 @@ graph TD
 | Task Type | Recommended Agent | Alternative |
 |-----------|------------------|-------------|
 | **Web API Development** | Claude | Gemini |
-| **CLI Tool Creation** | Claude | Q Chat |
+| **CLI Tool Creation** | Ollama | Claude |
 | **Data Processing** | Gemini | Claude |
 | **Documentation** | Claude | Gemini |
-| **Testing** | Claude | Q Chat |
+| **Testing** | Claude | Ollama |
 | **Refactoring** | Claude | Gemini |
-| **Simple Scripts** | Q Chat | Gemini |
+| **Simple Scripts** | Ollama | Gemini |
 | **Research** | Claude | Gemini |
-| **Prototyping** | Q Chat | Gemini |
+| **Prototyping** | Ollama | Gemini |
 | **Production Code** | Claude | - |
 | **CI/CD Pipelines** | ACP | Claude |
 | **Sandboxed Execution** | ACP | - |
@@ -291,20 +274,20 @@ python ralph_orchestrator.py \
   --agent-args "--temperature 0.7 --max-tokens 4096"
 ```
 
-### Q Chat Configuration
+### Ollama Configuration
 
 ```bash
-# Standard Q usage
-python ralph_orchestrator.py --agent q
+# Standard Ollama usage (local-first default)
+python ralph_orchestrator.py --agent ollama
 
-# With custom parameters
+# With specific model
 python ralph_orchestrator.py \
-  --agent q \
-  --agent-args "--context-length 50000"
+  --agent ollama \
+  --ollama-model gemma3:1b
 
 # Production configuration with enhanced settings
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-iterations 100 \
   --retry-delay 2 \
   --checkpoint-interval 10 \
@@ -312,21 +295,9 @@ python ralph_orchestrator.py \
 
 # High-concurrency configuration
 python ralph_orchestrator.py \
-  --agent q \
-  --agent-args "--async --timeout 300" \
+  --agent ollama \
+  --agent-args "--timeout 300" \
   --max-iterations 200
-```
-
-**Environment Variables:**
-```bash
-# Set Q chat timeout (default: 120 seconds)
-export QCHAT_TIMEOUT=300
-
-# Enable verbose logging
-export QCHAT_VERBOSE=1
-
-# Configure retry attempts
-export QCHAT_MAX_RETRIES=5
 ```
 
 ### Gemini Configuration
@@ -405,10 +376,10 @@ python ralph_orchestrator.py \
   --context-threshold 0.9
 ```
 
-### Q Chat Features
+### Ollama Features
 
-- **Speed**: Fast response times with streaming support
-- **Efficiency**: Lower resource usage with optimized memory management
+- **Local-first**: Runs entirely on your machine
+- **Speed**: Fast response times with minimal startup overhead
 - **Simplicity**: Straightforward for basic tasks
 - **Concurrency**: Thread-safe operations for parallel processing
 - **Reliability**: Automatic error recovery and retry mechanisms
@@ -416,28 +387,28 @@ python ralph_orchestrator.py \
 
 **Production Capabilities:**
 ```bash
-# Quick iterations with Q
+# Quick iterations with Ollama
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-iterations 100 \
   --retry-delay 1
 
-# Async execution with timeout
+# Execution with custom timeout
 python ralph_orchestrator.py \
-  --agent q \
-  --agent-args "--async --timeout 300" \
+  --agent ollama \
+  --agent-args "--timeout 300" \
   --checkpoint-interval 10
 
 # Stress testing configuration
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-iterations 500 \
   --metrics-interval 10 \
   --verbose
 
 # Long-running batch processing
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --checkpoint-interval 5 \
   --max-cost 50.0 \
   --retry-delay 5
@@ -532,8 +503,8 @@ Process with different agents for different phases:
 # Phase 1: Research with Claude
 python ralph_orchestrator.py --agent claude --prompt research.md
 
-# Phase 2: Implementation with Q
-python ralph_orchestrator.py --agent q --prompt implement.md
+# Phase 2: Implementation with Ollama
+python ralph_orchestrator.py --agent ollama --prompt implement.md
 
 # Phase 3: Documentation with Claude
 python ralph_orchestrator.py --agent claude --prompt document.md
@@ -544,8 +515,8 @@ python ralph_orchestrator.py --agent claude --prompt document.md
 Start with cheaper agents, escalate if needed:
 
 ```bash
-# Try Q first
-python ralph_orchestrator.py --agent q --max-cost 2.0
+# Try Ollama first
+python ralph_orchestrator.py --agent ollama --max-cost 0.0
 
 # If unsuccessful, try Claude
 python ralph_orchestrator.py --agent claude --max-cost 20.0
@@ -570,12 +541,12 @@ python ralph_orchestrator.py \
   --retry-delay 1
 ```
 
-### Q Chat Optimization
+### Ollama Optimization
 
 ```bash
 # Maximum efficiency
 python ralph_orchestrator.py \
-  --agent q \
+  --agent ollama \
   --max-iterations 200 \
   --checkpoint-interval 20 \
   --metrics-interval 50
@@ -598,7 +569,7 @@ python ralph_orchestrator.py \
 1. **Agent Not Found**
    ```bash
    # Check installation
-   which claude  # or q, gemini
+   which ollama  # or claude, gemini
    
    # Use auto-detection
    python ralph_orchestrator.py --agent auto --dry-run
@@ -643,8 +614,8 @@ python ralph_orchestrator.py \
 ### Budget Allocation
 
 ```bash
-# Low budget: Use Q
-python ralph_orchestrator.py --agent q --max-cost 5.0
+# Low budget: Use Ollama (local/free)
+python ralph_orchestrator.py --agent ollama --max-cost 0.0
 
 # Medium budget: Use Gemini
 python ralph_orchestrator.py --agent gemini --max-cost 25.0
@@ -670,7 +641,7 @@ python ralph_orchestrator.py \
 ### 1. Match Agent to Task
 
 - **Complex logic**: Use Claude
-- **Simple tasks**: Use Q Chat
+- **Simple tasks**: Use Ollama
 - **Data work**: Use Gemini
 
 ### 2. Start Small
@@ -701,7 +672,7 @@ python ralph_orchestrator.py --agent auto
 
 Balance quality with budget:
 
-- Development: Use Q Chat
+- Development: Use Ollama
 - Testing: Use Gemini
 - Production: Use Claude
 

@@ -15,7 +15,7 @@
    ```bash
    which claude
    which gemini
-   which q
+   which ollama
    ```
 
 2. Install missing agent:
@@ -355,7 +355,7 @@ Ralph's loop detection triggers when agent output is ≥90% similar to any of th
 
    ```bash
    # Q is typically faster
-   ralph run --agent q
+   ralph run --agent ollama
    ```
 
 #### High Memory Usage
@@ -479,13 +479,13 @@ Ralph's loop detection triggers when agent output is ≥90% similar to any of th
 
 **Solution**: Check Gemini CLI version and update
 
-#### Q Chat Errors
+#### Ollama Errors
 
 ```
 "Connection refused"
 ```
 
-**Solution**: Ensure Q service is running
+**Solution**: Ensure the Ollama service is running (e.g., restart `ollama serve` or the desktop app)
 
 ## Debug Mode
 
@@ -577,7 +577,7 @@ echo "============================"
 echo "Agents available:"
 which claude && echo "  ✓ Claude" || echo "  ✗ Claude"
 which gemini && echo "  ✓ Gemini" || echo "  ✗ Gemini"
-which q && echo "  ✓ Q" || echo "  ✗ Q"
+which ollama && echo "  ✓ Ollama" || echo "  ✗ Ollama"
 echo ""
 echo "Git status:"
 git status --short

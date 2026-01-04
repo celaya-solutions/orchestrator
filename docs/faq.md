@@ -18,9 +18,9 @@ The Ralph Wiggum technique was created by [Geoffrey Huntley](https://ghuntley.co
 
 Ralph Orchestrator currently supports:
 
-- **Claude** (Anthropic Claude Code CLI)
+- **Ollama** (local CLI, default)
 - **Gemini** (Google Gemini CLI)
-- **Q Chat** (Q CLI tool)
+- **Claude** (Anthropic Claude Code CLI)
 
 The system auto-detects available agents and can automatically select the best one.
 
@@ -39,8 +39,9 @@ npm install -g @anthropic-ai/claude-code
 # Gemini
 npm install -g @google/gemini-cli
 
-# Q Chat
-# Follow instructions at https://github.com/qchat/qchat
+# Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull gemma3:1b
 ```
 
 ### What are the system requirements?
@@ -157,7 +158,7 @@ Edit `ralph.json`:
 
 ```json
 {
-  "agent": "claude" // or "gemini", "q", "auto"
+  "agent": "ollama" // or "gemini", "claude", "auto"
 }
 ```
 
