@@ -48,6 +48,32 @@ class OrchestratorMonitor:
         self.database = DatabaseManager()
         self.active_runs: Dict[str, int] = {}  # Maps orchestrator_id to run_id
         self.active_iterations: Dict[str, int] = {}  # Maps orchestrator_id to iteration_id
+
+    def _safe_metric(self, collector, default):
+        """Execute a metric collector and return a safe default on failure."""
+        try:
+            return collector()
+        except Exception as exc:  # pragma: no cover - logging path
+            logger.debug(f"Metric collection failed: {exc}")
+            return default
+
+    def _collect_system_metrics(self) -> Dict[str, Any]:
+        """Collect system metrics with fallbacks to avoid breaking monitoring loops."""
+        memory_info = self._safe_metric(psutil.virtual_memory, None)
+        memory_metrics = {
+            "total": getattr(memory_info, "total", 0),
+            "available": getattr(memory_info, "available", 0),
+            "percent": getattr(memory_info, "percent", 0)
+        }
+
+        return {
+            "timestamp": datetime.now().isoformat(),
+            # interval=None returns an instantaneous value without blocking
+            "cpu_percent": self._safe_metric(lambda: psutil.cpu_percent(interval=None), 0.0),
+            "memory": memory_metrics,
+            "active_processes": self._safe_metric(lambda: len(psutil.pids()), 0),
+            "orchestrators": len(self.active_orchestrators)
+        }
         
     async def start_monitoring(self):
         """Start background monitoring tasks."""
@@ -66,33 +92,19 @@ class OrchestratorMonitor:
     async def _monitor_system_metrics(self):
         """Monitor system metrics continuously."""
         while True:
+            metrics = self._collect_system_metrics()
+            self.metrics_cache["system"] = metrics
+
             try:
-                # Collect system metrics
-                metrics = {
-                    "timestamp": datetime.now().isoformat(),
-                    "cpu_percent": psutil.cpu_percent(interval=1),
-                    "memory": {
-                        "total": psutil.virtual_memory().total,
-                        "available": psutil.virtual_memory().available,
-                        "percent": psutil.virtual_memory().percent
-                    },
-                    "active_processes": len(psutil.pids()),
-                    "orchestrators": len(self.active_orchestrators)
-                }
-                
-                self.metrics_cache["system"] = metrics
-                
                 # Broadcast to WebSocket clients
                 await self._broadcast_to_clients({
                     "type": "system_metrics",
                     "data": metrics
                 })
-                
-                await asyncio.sleep(5)  # Update every 5 seconds
-                
-            except Exception as e:
+            except Exception as e:  # pragma: no cover - logging path
                 logger.error(f"Error monitoring system metrics: {e}")
-                await asyncio.sleep(5)
+
+            await asyncio.sleep(5)  # Update every 5 seconds
     
     async def _broadcast_to_clients(self, message: Dict[str, Any]):
         """Broadcast message to all connected WebSocket clients."""

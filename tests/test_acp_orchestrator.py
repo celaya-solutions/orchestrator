@@ -296,6 +296,18 @@ class TestACPGracefulShutdown:
         assert adapter._client is None
         assert adapter._session is None
 
+    @pytest.mark.asyncio
+    async def test_shutdown_wrapper_invokes_internal_shutdown(self):
+        """shutdown() should delegate to _shutdown and restore handlers."""
+        adapter = ACPAdapter()
+        adapter._shutdown = AsyncMock()
+        adapter._restore_signal_handlers = MagicMock()
+
+        await adapter.shutdown()
+
+        adapter._shutdown.assert_awaited_once()
+        adapter._restore_signal_handlers.assert_called_once()
+
     def test_signal_handler_calls_kill_subprocess(self):
         """Test signal handler triggers subprocess kill."""
         adapter = ACPAdapter()

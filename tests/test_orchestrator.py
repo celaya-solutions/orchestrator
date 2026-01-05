@@ -3,6 +3,7 @@
 
 """Tests for Ralph Orchestrator."""
 
+import asyncio
 import unittest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
@@ -561,9 +562,46 @@ class TestAutoSelectionPriority(unittest.TestCase):
                 )
                 self.assertEqual(orchestrator.current_adapter_name, "claude")
                 self.assertIs(orchestrator.current_adapter, adapters["claude"])
-                self.assertFalse(orchestrator.allow_fallbacks)
+            self.assertFalse(orchestrator.allow_fallbacks)
         finally:
             Path(prompt_file).unlink()
+
+
+class TestOrchestratorCleanup(unittest.TestCase):
+    """Tests for orchestrator cleanup hooks."""
+
+    def test_shutdown_adapters_invokes_shutdown_hook(self):
+        """Ensure adapters with shutdown hooks are called."""
+
+        class DummyAdapter:
+            name = "dummy"
+            available = True
+
+            def __init__(self):
+                self.shutdown_called = False
+
+            async def shutdown(self):
+                self.shutdown_called = True
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            prompt_file = Path(tmpdir) / "prompt.md"
+            prompt_file.write_text("test prompt")
+
+            adapter = DummyAdapter()
+
+            with patch.object(
+                RalphOrchestrator, "_initialize_adapters", return_value={"dummy": adapter}
+            ), patch.object(
+                RalphOrchestrator, "_select_adapter", return_value=("dummy", adapter)
+            ):
+                orchestrator = RalphOrchestrator(
+                    prompt_file_or_config=prompt_file,
+                    primary_tool="dummy",
+                    max_iterations=1,
+                )
+                asyncio.run(orchestrator._shutdown_adapters())
+
+            self.assertTrue(adapter.shutdown_called)
 
 
 if __name__ == "__main__":

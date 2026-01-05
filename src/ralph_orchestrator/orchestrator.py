@@ -7,6 +7,7 @@ import time
 import signal
 import logging
 import asyncio
+import inspect
 from pathlib import Path
 from typing import Dict, Any, Optional
 import json
@@ -289,8 +290,23 @@ class RalphOrchestrator:
                     )
                 except asyncio.TimeoutError:
                     logger.debug("Cleanup transport timed out during emergency shutdown")
+            await self._shutdown_adapters()
         except Exception as e:
             logger.debug(f"Error during emergency cleanup (ignored): {type(e).__name__}: {e}")
+
+    async def _shutdown_adapters(self) -> None:
+        """Gracefully shut down adapters that expose a shutdown hook."""
+        for name, adapter in self.adapters.items():
+            shutdown_fn = getattr(adapter, "shutdown", None) or getattr(adapter, "_shutdown", None)
+            if not shutdown_fn or not callable(shutdown_fn):
+                continue
+
+            try:
+                result = shutdown_fn()
+                if inspect.isawaitable(result):
+                    await asyncio.wait_for(result, timeout=2)
+            except Exception as e:
+                logger.debug("Adapter %s shutdown failed: %s", name, e)
     
     def run(self) -> None:
         """Run the main orchestration loop."""
@@ -352,126 +368,132 @@ class RalphOrchestrator:
         start_time = time.time()
         self._start_time = start_time  # Store for state retrieval
 
-        while not self.stop_requested:
-            # Check safety limits
-            safety_check = self.safety_guard.check(
-                self.metrics.iterations,
-                time.time() - start_time,
-                self.cost_tracker.total_cost if self.cost_tracker else 0
-            )
-            
-            if not safety_check.passed:
-                logger.info(f"Safety limit reached: {safety_check.reason}")
-                break
-
-            # Check for explicit completion marker in prompt
-            if self._check_completion_marker():
-                logger.info("Completion marker found - task marked complete")
-                self.console.print_success("Task completion marker detected - stopping orchestration")
-                break
-            
-            # Determine trigger reason BEFORE incrementing iteration
-            trigger_reason = self._determine_trigger_reason()
-
-            # Execute iteration
-            self.metrics.iterations += 1
-            self.console.print_iteration_header(self.metrics.iterations)
-            logger.info(f"Starting iteration {self.metrics.iterations}")
-
-            # Record iteration timing
-            iteration_start = time.time()
-            iteration_success = False
-            iteration_error = ""
-            loop_detected = False
-
-            try:
-                success = await self._aexecute_iteration()
-
-                if success:
-                    iteration_success = True
-                    self.metrics.successful_iterations += 1
-                    self.console.print_success(
-                        f"Iteration {self.metrics.iterations} completed successfully"
-                    )
-                    # Show agent output for this iteration
-                    if self.last_response_output:
-                        self.console.print_header(f"Agent Output (Iteration {self.metrics.iterations})")
-                        self.console.print_message(self.last_response_output)
-
-                        # Check for loop (repeated similar outputs)
-                        if self.safety_guard.detect_loop(self.last_response_output):
-                            loop_detected = True
-                            self.console.print_warning(
-                                "Loop detected - agent producing repetitive outputs"
-                            )
-                            logger.warning("Breaking loop due to repetitive agent outputs")
-                else:
-                    self.metrics.failed_iterations += 1
-                    iteration_error = "Iteration failed"
-                    self.console.print_warning(
-                        f"Iteration {self.metrics.iterations} failed"
-                    )
-                    # If caller explicitly chose an agent, stop after first failure
-                    if not self.allow_fallbacks:
-                        self.console.print_warning(
-                            "Primary adapter failed and fallback is disabled - stopping"
-                        )
-                        self.stop_requested = True
-                    else:
-                        await self._handle_failure()
-
-                # Checkpoint if needed
-                if self.metrics.iterations % self.checkpoint_interval == 0:
-                    await self._create_checkpoint()
-                    self.console.print_info(
-                        f"Checkpoint {self.metrics.checkpoints} created"
-                    )
-
-            except Exception as e:
-                logger.warning(f"Error in iteration: {e}")
-                self.metrics.errors += 1
-                iteration_error = str(e)
-                self.console.print_error(f"Error in iteration: {e}")
-                self._handle_error(e)
-
-            # Record per-iteration telemetry
-            iteration_duration = time.time() - iteration_start
-
-            # Extract cost/tokens from the latest usage if available
-            iteration_tokens = 0
-            iteration_cost = 0.0
-            if self.cost_tracker and self.cost_tracker.usage_history:
-                latest_usage = self.cost_tracker.usage_history[-1]
-                # Only use if this usage is from this iteration (recent timestamp)
-                if latest_usage.get("timestamp", 0) >= iteration_start:
-                    iteration_tokens = latest_usage.get("input_tokens", 0) + latest_usage.get("output_tokens", 0)
-                    iteration_cost = latest_usage.get("cost", 0.0)
-
-            # Record per-iteration telemetry if enabled
-            if self.iteration_stats:
-                # Get output preview (truncated to configured length)
-                output_preview = ""
-                if self.last_response_output:
-                    preview_len = self.output_preview_length
-                    output_preview = self.last_response_output[:preview_len] if len(self.last_response_output) > preview_len else self.last_response_output
-
-                self.iteration_stats.record_iteration(
-                    iteration=self.metrics.iterations,
-                    duration=iteration_duration,
-                    success=iteration_success,
-                    error=iteration_error,
-                    trigger_reason=trigger_reason,
-                    output_preview=output_preview,
-                    tokens_used=iteration_tokens,
-                    cost=iteration_cost,
+        try:
+            while not self.stop_requested:
+                # Check safety limits
+                safety_check = self.safety_guard.check(
+                    self.metrics.iterations,
+                    time.time() - start_time,
+                    self.cost_tracker.total_cost if self.cost_tracker else 0
                 )
+                
+                if not safety_check.passed:
+                    logger.info(f"Safety limit reached: {safety_check.reason}")
+                    break
 
-            # Break loop if detected (after recording telemetry)
-            if loop_detected:
-                break
-            
-            # Brief pause between iterations
-            await asyncio.sleep(2)
+                # Check for explicit completion marker in prompt
+                if self._check_completion_marker():
+                    logger.info("Completion marker found - task marked complete")
+                    self.console.print_success("Task completion marker detected - stopping orchestration")
+                    break
+                
+                # Determine trigger reason BEFORE incrementing iteration
+                trigger_reason = self._determine_trigger_reason()
+
+                # Execute iteration
+                self.metrics.iterations += 1
+                self.console.print_iteration_header(self.metrics.iterations)
+                logger.info(f"Starting iteration {self.metrics.iterations}")
+
+                # Record iteration timing
+                iteration_start = time.time()
+                iteration_success = False
+                iteration_error = ""
+                loop_detected = False
+
+                try:
+                    success = await self._aexecute_iteration()
+
+                    if success:
+                        iteration_success = True
+                        self.metrics.successful_iterations += 1
+                        self.console.print_success(
+                            f"Iteration {self.metrics.iterations} completed successfully"
+                        )
+                        # Show agent output for this iteration
+                        if self.last_response_output:
+                            self.console.print_header(f"Agent Output (Iteration {self.metrics.iterations})")
+                            self.console.print_message(self.last_response_output)
+
+                            # Check for loop (repeated similar outputs)
+                            if self.safety_guard.detect_loop(self.last_response_output):
+                                loop_detected = True
+                                self.console.print_warning(
+                                    "Loop detected - agent producing repetitive outputs"
+                                )
+                                logger.warning("Breaking loop due to repetitive agent outputs")
+                    else:
+                        self.metrics.failed_iterations += 1
+                        iteration_error = "Iteration failed"
+                        self.console.print_warning(
+                            f"Iteration {self.metrics.iterations} failed"
+                        )
+                        # If caller explicitly chose an agent, stop after first failure
+                        if not self.allow_fallbacks:
+                            self.console.print_warning(
+                                "Primary adapter failed and fallback is disabled - stopping"
+                            )
+                            self.stop_requested = True
+                        else:
+                            await self._handle_failure()
+
+                    # Checkpoint if needed
+                    if self.metrics.iterations % self.checkpoint_interval == 0:
+                        await self._create_checkpoint()
+                        self.console.print_info(
+                            f"Checkpoint {self.metrics.checkpoints} created"
+                        )
+
+                except Exception as e:
+                    logger.warning(f"Error in iteration: {e}")
+                    self.metrics.errors += 1
+                    iteration_error = str(e)
+                    self.console.print_error(f"Error in iteration: {e}")
+                    self._handle_error(e)
+
+                # Record per-iteration telemetry
+                iteration_duration = time.time() - iteration_start
+
+                # Extract cost/tokens from the latest usage if available
+                iteration_tokens = 0
+                iteration_cost = 0.0
+                if self.cost_tracker and self.cost_tracker.usage_history:
+                    latest_usage = self.cost_tracker.usage_history[-1]
+                    # Only use if this usage is from this iteration (recent timestamp)
+                    if latest_usage.get("timestamp", 0) >= iteration_start:
+                        iteration_tokens = latest_usage.get("input_tokens", 0) + latest_usage.get("output_tokens", 0)
+                        iteration_cost = latest_usage.get("cost", 0.0)
+
+                # Record per-iteration telemetry if enabled
+                if self.iteration_stats:
+                    # Get output preview (truncated to configured length)
+                    output_preview = ""
+                    if self.last_response_output:
+                        preview_len = self.output_preview_length
+                        output_preview = self.last_response_output[:preview_len] if len(self.last_response_output) > preview_len else self.last_response_output
+
+                    self.iteration_stats.record_iteration(
+                        iteration=self.metrics.iterations,
+                        duration=iteration_duration,
+                        success=iteration_success,
+                        error=iteration_error,
+                        trigger_reason=trigger_reason,
+                        output_preview=output_preview,
+                        tokens_used=iteration_tokens,
+                        cost=iteration_cost,
+                    )
+
+                # Break loop if detected (after recording telemetry)
+                if loop_detected:
+                    break
+                
+                # Brief pause between iterations
+                await asyncio.sleep(2)
+        finally:
+            try:
+                await self._shutdown_adapters()
+            except Exception as e:  # pragma: no cover - best effort cleanup
+                logger.debug("Adapter shutdown during teardown failed: %s", e)
         
         # Final summary
         self._print_summary()

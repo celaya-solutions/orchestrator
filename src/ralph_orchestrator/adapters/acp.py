@@ -628,6 +628,11 @@ class ACPAdapter(ToolAdapter):
         self._session_id = None
         self._session = None
 
+    async def shutdown(self) -> None:
+        """Gracefully shut down the ACP adapter and restore signal handlers."""
+        await self._shutdown()
+        self._restore_signal_handlers()
+
     def execute(self, prompt: str, **kwargs) -> ToolResponse:
         """Execute the prompt synchronously.
 
