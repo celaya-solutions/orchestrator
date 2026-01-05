@@ -54,14 +54,17 @@ adapters:
     tool_permissions:         # Tool permissions for Claude
       allow_all: true         # Allow all tools without approval
 
-  acp:                        # Agent Client Protocol adapter
+  acp:
     enabled: true
     timeout: 300
-    max_retries: 3
-    args: []
-    env: {}
     tool_permissions:
       agent_command: gemini
       agent_args: []
-      permission_mode: auto_approve  # auto_approve, deny_all, allowlist, interactive
-      permission_allowlist: []       # Patterns for allowlist mode
+      permission_mode: allowlist
+      permission_allowlist:
+        - "fs/read_text_file:*"
+        - "fs/write_text_file:runs/*"
+        - "terminal/create:bash runs/*/verify.sh"
+        - "terminal/create:python tools/*"
+        - "terminal/create:git status*"
+        - "terminal/create:git rev-parse*"
