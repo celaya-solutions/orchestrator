@@ -400,7 +400,7 @@ class RalphConfig:
         }
 
         with self._lock:
-            verbosity = verbosity_map.get(self.output_verbosity.lower(), VerbosityLevel.NORMAL)
+            verbosity = verbosity_map.get(self.output_verbosity.lower(), VerbosityLevel.VERBOSE)
             return create_formatter(
                 format_type=self.output_format,
                 verbosity=verbosity,
