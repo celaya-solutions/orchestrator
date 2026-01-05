@@ -4,7 +4,7 @@
 # Core orchestrator settings
 agent: auto                    # Which agent to use: ollama, gemini, claude, acp, auto (auto prefers ollama)
 prompt_file: PROMPT.md         # Path to prompt file
-max_iterations: 100            # Maximum iterations before stopping
+max_iterations: 10000          # Maximum iterations before stopping
 max_runtime: 14400             # Maximum runtime in seconds (4 hours)
 checkpoint_interval: 5         # Git checkpoint every N iterations
 retry_delay: 2                 # Delay between retries in seconds
