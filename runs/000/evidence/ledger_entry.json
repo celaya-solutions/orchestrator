@@ -2,7 +2,7 @@
   "run_id": "000",
   "timestamp": "2026-01-05T17:02:10Z",
   "hashes_manifest": "runs/000/evidence/hashes.manifest.json",
-  "hashes_manifest_root": "e389e604dacde7a47d3f1145f6cef49864ccd8cde1e5eae3acf6c327a6ca553b",
+  "hashes_manifest_root": "a4170bc62717a580d3647d1b309f7c695a0bd11f98e0857d2886dff00efbe446",
   "git_commit": "e9b7ec4c89784f703569ddbc451bda4b5c937ed3",
   "artifacts": {
     "dossier": "runs/000/evidence/dossier.json",

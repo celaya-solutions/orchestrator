@@ -1,0 +1,38 @@
+{
+  "summary": {
+    "iterations": 1,
+    "successful": 0,
+    "failed": 1,
+    "errors": 0,
+    "checkpoints": 0,
+    "rollbacks": 0
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "duration": 4.095668077468872,
+      "success": false,
+      "error": "Iteration failed",
+      "timestamp": "2026-01-05T10:10:10.709348",
+      "trigger_reason": "initial",
+      "output_preview": "",
+      "tokens_used": 0,
+      "cost": 0.0,
+      "tools_used": []
+    }
+  ],
+  "cost": {
+    "total": 0.0,
+    "by_tool": {},
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "by_tool": {}
+    },
+    "history": []
+  },
+  "analysis": {
+    "avg_iteration_duration": 4.095668077468872,
+    "success_rate": 0.0
+  }
+}

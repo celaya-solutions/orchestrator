@@ -2,8 +2,8 @@
   "run_id": "000",
   "objective": "Produce an inspection-ready Proof & Provenance Pack for this run under runs/000/evidence/.",
   "timestamps": {
-    "started": "2026-01-05T09:56:50.795557",
-    "ended": "2026-01-05T09:56:54.923437"
+    "started": "2026-01-05T10:10:10.709348",
+    "ended": "2026-01-05T10:10:14.805016"
   },
   "git": {
     "commit_hash": "e9b7ec4c89784f703569ddbc451bda4b5c937ed3"
@@ -14,9 +14,9 @@
     "active_context": "Lab is research-first/non-commercial; external frontier models require explicit justification; keep PII segregated and avoid exfiltration."
   },
   "model": {
-    "selected_adapter": "auto → ollama",
-    "model_id": "gemma3:1b",
-    "provider": "ollama (local)"
+    "selected_adapter": "acp (auto-selected)",
+    "model_id": "gemma3:1b (ollama default); Gemini CLI would be invoked via ACP but failed auth",
+    "provider": "acp via gemini-cli (auth failed before tool use)"
   },
   "sampling_parameters": {
     "max_iterations": 100,
@@ -43,24 +43,25 @@
       {
         "iteration": 1,
         "trigger_reason": "initial",
-        "duration_seconds": 4.127880096435547,
+        "duration_seconds": 4.095668077468872,
         "success": false,
         "error": "Iteration failed",
-        "timestamp": "2026-01-05T09:56:50.795557",
+        "timestamp": "2026-01-05T10:10:10.709348",
         "tools_used": []
       }
     ],
-    "source": "runs/000/evidence/ralph/metrics/metrics_20260105_095652.json"
+    "source": "runs/000/evidence/ralph/metrics/metrics_20260105_101012.json"
   },
-  "tool_usage_summary": "No tools invoked before failure; tools_used array empty in metrics.",
+  "tool_usage_summary": "No tools invoked; ACP adapter aborted with authentication required before any tool call.",
   "artifacts": {
     "evidence_root": "runs/000/evidence",
-    "ralph_metrics": "runs/000/evidence/ralph/metrics/metrics_20260105_095652.json",
+    "ralph_metrics": "runs/000/evidence/ralph/metrics/metrics_20260105_101012.json",
     "ralph_log": "ralph.log",
     "config": "ralph.yml"
   },
   "notes": [
+    "ACP adapter terminated due to missing authentication; fallback disabled so run stopped after iteration 1.",
     "Ralph orchestrator reported completion with an ignored asyncio BaseSubprocessTransport cleanup warning: RuntimeError: Event loop is closed.",
-    "Run halted after first iteration failure; no checkpoints beyond initial state were produced."
+    "Run halted after first iteration failure; no checkpoints were produced."
   ]
 }
