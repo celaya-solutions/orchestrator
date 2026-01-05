@@ -1,0 +1,72 @@
+{
+  "summary": {
+    "iterations": 2,
+    "successful": 2,
+    "failed": 0,
+    "errors": 0,
+    "checkpoints": 0,
+    "rollbacks": 0
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "duration": 3.6607918739318848,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-04T17:43:57.527580",
+      "trigger_reason": "initial",
+      "output_preview": "```\nTASK_COMPLETE\n```\n\n",
+      "tokens_used": 6,
+      "cost": 0.0,
+      "tools_used": []
+    },
+    {
+      "iteration": 2,
+      "duration": 2.4839751720428467,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-04T17:44:02.015839",
+      "trigger_reason": "task_incomplete",
+      "output_preview": "```text\nTASK_COMPLETE\n```\n\n\n",
+      "tokens_used": 8,
+      "cost": 0.0,
+      "tools_used": []
+    }
+  ],
+  "cost": {
+    "total": 0.0,
+    "by_tool": {
+      "ollama": 0.0
+    },
+    "tokens": {
+      "input": 12,
+      "output": 2,
+      "by_tool": {
+        "ollama": {
+          "input": 12,
+          "output": 2
+        }
+      }
+    },
+    "history": [
+      {
+        "timestamp": 1767573837.435691,
+        "tool": "ollama",
+        "input_tokens": 5,
+        "output_tokens": 1,
+        "cost": 0.0
+      },
+      {
+        "timestamp": 1767573842.009332,
+        "tool": "ollama",
+        "input_tokens": 7,
+        "output_tokens": 1,
+        "cost": 0.0
+      }
+    ]
+  },
+  "analysis": {
+    "avg_iteration_duration": 3.0723835229873657,
+    "success_rate": 100.0
+  }
+}

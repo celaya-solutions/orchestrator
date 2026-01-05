@@ -1,0 +1,3 @@
+# Task: Implement ACP Adapter for Ralph-Orchestrator
+
+## ✅ DOCUMENTATION UPDATED (Dec 14, 2025)

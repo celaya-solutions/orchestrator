@@ -1,0 +1,50 @@
+{
+  "summary": {
+    "iterations": 2,
+    "successful": 2,
+    "failed": 0,
+    "errors": 0,
+    "checkpoints": 0,
+    "rollbacks": 0
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "duration": 58.161535024642944,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-04T12:49:23.237079",
+      "trigger_reason": "initial",
+      "output_preview": "```python\nimport json\nimport os\n\ndef ingest_files():\n    \"\"\"Lists uploaded files and classifies them.\"\"\"\n    file_ingestion_report.json = []\n    file_ingestion_report.json.append(\"File List:\")\n    for file_name in os.listdir():\n        if file_name.endswith(\".json\") or file_name.endswith(\".xlsx\") or file_name.endswith(\".csv\"):\n            try:\n                file_name = file_name.replace(\".json\", \"\")\n                file_name = file_name.replace(\".xlsx\", \"\")\n                file_name = file_nam",
+      "tokens_used": 0,
+      "cost": 0.0,
+      "tools_used": []
+    },
+    {
+      "iteration": 2,
+      "duration": 63.64187574386597,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-04T12:50:28.884697",
+      "trigger_reason": "task_incomplete",
+      "output_preview": "```python\nimport json\nimport os\n\ndef ingest_files():\n    \"\"\"Lists uploaded files and classifies them.\"\"\"\n    file_ingestion_report.json = []\n    file_ingestion_report.json.append(\"File List:\")\n    for filename in os.listdir():\n        if filename.endswith(\".json\"):\n            try:\n                with open(os.path.join(os.getcwd(), filename), \"r\") as f:\n                    data = json.load(f)\n                    file_ingestion_report.json.append(f\"File: {filename}\")\n            except (FileNotF",
+      "tokens_used": 0,
+      "cost": 0.0,
+      "tools_used": []
+    }
+  ],
+  "cost": {
+    "total": 0,
+    "by_tool": {},
+    "tokens": {
+      "input": 0,
+      "output": 0,
+      "by_tool": {}
+    },
+    "history": []
+  },
+  "analysis": {
+    "avg_iteration_duration": 60.901705384254456,
+    "success_rate": 100.0
+  }
+}

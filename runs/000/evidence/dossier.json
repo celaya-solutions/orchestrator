@@ -1,0 +1,66 @@
+{
+  "run_id": "000",
+  "objective": "Produce an inspection-ready Proof & Provenance Pack for this run under runs/000/evidence/.",
+  "timestamps": {
+    "started": "2026-01-05T09:56:50.795557",
+    "ended": "2026-01-05T09:56:54.923437"
+  },
+  "git": {
+    "commit_hash": "e9b7ec4c89784f703569ddbc451bda4b5c937ed3"
+  },
+  "prompt": {
+    "file": "PROMPT.md",
+    "policy_summary": "Non-negotiable: minimum 25 iterations, stop only when stability criteria met; work confined to ./workspace; no web/APIs; evidence quotes for claims; maintain contradictions and lenses; output signature per run.",
+    "active_context": "Lab is research-first/non-commercial; external frontier models require explicit justification; keep PII segregated and avoid exfiltration."
+  },
+  "model": {
+    "selected_adapter": "auto → ollama",
+    "model_id": "gemma3:1b",
+    "provider": "ollama (local)"
+  },
+  "sampling_parameters": {
+    "max_iterations": 100,
+    "max_runtime_seconds": 14400,
+    "checkpoint_interval": 5,
+    "max_tokens": 1000000,
+    "max_cost_usd": 50.0,
+    "context_window": 200000,
+    "context_threshold": 0.8,
+    "archive_prompts": true,
+    "git_checkpoint": true
+  },
+  "metrics": {
+    "iterations": 1,
+    "successful": 0,
+    "failed": 1,
+    "success_rate": 0.0,
+    "cost_total_usd": 0.0,
+    "token_usage": {
+      "input": 0,
+      "output": 0
+    },
+    "iteration_details": [
+      {
+        "iteration": 1,
+        "trigger_reason": "initial",
+        "duration_seconds": 4.127880096435547,
+        "success": false,
+        "error": "Iteration failed",
+        "timestamp": "2026-01-05T09:56:50.795557",
+        "tools_used": []
+      }
+    ],
+    "source": "runs/000/evidence/ralph/metrics/metrics_20260105_095652.json"
+  },
+  "tool_usage_summary": "No tools invoked before failure; tools_used array empty in metrics.",
+  "artifacts": {
+    "evidence_root": "runs/000/evidence",
+    "ralph_metrics": "runs/000/evidence/ralph/metrics/metrics_20260105_095652.json",
+    "ralph_log": "ralph.log",
+    "config": "ralph.yml"
+  },
+  "notes": [
+    "Ralph orchestrator reported completion with an ignored asyncio BaseSubprocessTransport cleanup warning: RuntimeError: Event loop is closed.",
+    "Run halted after first iteration failure; no checkpoints beyond initial state were produced."
+  ]
+}

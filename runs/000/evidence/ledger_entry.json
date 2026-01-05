@@ -1,0 +1,14 @@
+{
+  "run_id": "000",
+  "timestamp": "2026-01-05T17:02:10Z",
+  "hashes_manifest": "runs/000/evidence/hashes.manifest.json",
+  "hashes_manifest_root": "e389e604dacde7a47d3f1145f6cef49864ccd8cde1e5eae3acf6c327a6ca553b",
+  "git_commit": "e9b7ec4c89784f703569ddbc451bda4b5c937ed3",
+  "artifacts": {
+    "dossier": "runs/000/evidence/dossier.json",
+    "ralph_bundle": "runs/000/evidence/ralph",
+    "verify_script": "runs/000/verify.sh"
+  },
+  "status": "failed",
+  "summary": "Ralph orchestrator run halted after first iteration failure; no tool calls executed."
+}
