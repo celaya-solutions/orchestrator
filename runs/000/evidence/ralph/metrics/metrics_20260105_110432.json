@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "iterations": 3,
+    "successful": 2,
+    "failed": 1,
+    "errors": 0,
+    "checkpoints": 0,
+    "rollbacks": 0
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "duration": 28.45073676109314,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-05T11:03:49.254107",
+      "trigger_reason": "initial",
+      "output_preview": "```python\ndef run_iteration(iteration_count, stability_window, min_iterations, min_coverage):\n    \"\"\"\n    Runs one iteration of the Notion Emergence Loop.\n\n    Args:\n        iteration_count: The current iteration count.\n        stability_window: The number of runs to check for convergence.\n        min_iterations: The minimum number of iterations required.\n        min_coverage: The minimum coverage required for convergence.\n    \"\"\"\n\n    print(f\"Iteration {iteration_count}:\")\n    print(f\"  Iterati",
+      "tokens_used": 1051,
+      "cost": 0.0,
+      "tools_used": []
+    },
+    {
+      "iteration": 2,
+      "duration": 18.0732319355011,
+      "success": true,
+      "error": "",
+      "timestamp": "2026-01-05T11:04:09.329587",
+      "trigger_reason": "task_incomplete",
+      "output_preview": "```python\ndef run_iteration(iteration_count, stability_window, min_iterations, min_coverage):\n    \"\"\"\n    Runs one iteration of the Notion Emergence Loop.\n\n    Args:\n        iteration_count: The current iteration number.\n        stability_window: The stability window for convergence.\n        min_iterations: The minimum number of iterations required.\n        min_coverage: The minimum coverage percentage for convergence.\n    \"\"\"\n    if iteration_count >= MIN_ITERATIONS:\n        print(\"Iteration co",
+      "tokens_used": 660,
+      "cost": 0.0,
+      "tools_used": []
+    },
+    {
+      "iteration": 3,
+      "duration": 19.364801168441772,
+      "success": false,
+      "error": "Iteration failed",
+      "timestamp": "2026-01-05T11:04:30.698494",
+      "trigger_reason": "task_incomplete",
+      "output_preview": "```python\ndef run_iteration(iteration_count, stability_window, min_iterations, min_coverage):\n    \"\"\"\n    Runs one iteration of the Notion Emergence Loop.\n\n    Args:\n        iteration_count: The current iteration number.\n        stability_window: The stability window for convergence.\n        min_iterations: The minimum number of iterations required.\n        min_coverage: The minimum coverage percentage for convergence.\n    \"\"\"\n    if iteration_count >= MIN_ITERATIONS:\n        print(\"Iteration co",
+      "tokens_used": 0,
+      "cost": 0.0,
+      "tools_used": []
+    }
+  ],
+  "cost": {
+    "total": 0.0,
+    "by_tool": {
+      "ollama": 0.0
+    },
+    "tokens": {
+      "input": 1369,
+      "output": 342,
+      "by_tool": {
+        "ollama": {
+          "input": 1369,
+          "output": 342
+        }
+      }
+    },
+    "history": [
+      {
+        "timestamp": 1767636229.1693509,
+        "tool": "ollama",
+        "input_tokens": 841,
+        "output_tokens": 210,
+        "cost": 0.0
+      },
+      {
+        "timestamp": 1767636249.309921,
+        "tool": "ollama",
+        "input_tokens": 528,
+        "output_tokens": 132,
+        "cost": 0.0
+      }
+    ]
+  },
+  "analysis": {
+    "avg_iteration_duration": 21.962923288345337,
+    "success_rate": 66.66666666666666
+  }
+}

@@ -1,10 +1,10 @@
 {
   "run_id": "000",
-  "generated_at": "2026-01-05T17:11:22.875418Z",
+  "generated_at": "2026-01-05T18:15:12.962139Z",
   "algorithm": "sha256",
-  "root_hash_method": "sha256 over newline-joined 'path:hash' entries sorted by path",
+  "root_hash_method": "sha256 over newline-joined 'path:hash' entries sorted by path (ledger excluded to avoid self-reference)",
   "files": {
-    "runs/000/evidence/dossier.json": "2c76d4eab7fb4b3b7e66df2812b8941cacda6c3a358c60619d3ddf095c8cdef4",
+    "runs/000/evidence/dossier.json": "322a966f9ce0ac8258158bf23c8dd778107ac598b4ba5a590b0faf50cd062570",
     "runs/000/evidence/ralph/cache/prefix_9ca3b4be.txt": "9ca3b4be6c81a6610f98e1b5a5a312d389efdd700256bd196e2e2b109c365d9f",
     "runs/000/evidence/ralph/cache/prefix_d93d02dd.txt": "d93d02dde96bf24a4ec637d02f90a36fd8be2b7e3030ae2d93b2529173b53a69",
     "runs/000/evidence/ralph/metrics/metrics_20260103_225615.json": "19bbe6bf3d841ce0b5336304e6f2fc52eadaf68f9800bf882a1cb92a3f54b74f",
@@ -37,9 +37,15 @@
     "runs/000/evidence/ralph/metrics/metrics_20260104_183006.json": "6fbd1cabfe89cfcab803ea4641ea87483cda9ffceb7716d25c752444acdc6ac5",
     "runs/000/evidence/ralph/metrics/metrics_20260104_183219.json": "781f07ab64c84052f6c7092a6b9519816107adcf5cbe41e838a870ca4a8d36d9",
     "runs/000/evidence/ralph/metrics/metrics_20260105_095652.json": "c0c5ff67a5395f3d27e70be4e267af53d16e238ca26b4da5f1e371551723939c",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_100935.json": "f7adc8bdbb54307511629fdef52704927a889eca1a18380fccdbf73e8261313e",
     "runs/000/evidence/ralph/metrics/metrics_20260105_101012.json": "8c7e5c7e8a2f1a8253e78ef4d97ee63afe765f8f09d2fca8a773a9424c802c7f",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_101757.json": "cc72027e55d6ab66098b6e7d7d693315084c2e061c06a143d7b00040bc173783",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_102431.json": "44d19956ada2c2cbbbca841b42e576126f5eda390839278774c2fed525252a02",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_110432.json": "2ee057ba2fb77bc118ddf133cacef946b37404e07a9d9517e61fc3985b1753a2",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_110456.json": "8adba6c543639c0a7b1c63ba387a306f222cac11cf1c39bc5d2c8a209800c7f0",
+    "runs/000/evidence/ralph/metrics/metrics_20260105_110733.json": "89fe04a0b40f119e1b52a27f161a966eca60b2cacc61ed04c19ccb181c19b45f",
     "runs/000/evidence/ralph/scratchpad.md": "014500e400c66072c3dd50f3c3279701f8da134a3b061bfe460cc64cafc2d147",
     "runs/000/verify.sh": "3f52834d7a32ab3fcd23fb48d86359eae2bab8012896bad36624f9decd8e6cd9"
   },
-  "root_hash": "a4170bc62717a580d3647d1b309f7c695a0bd11f98e0857d2886dff00efbe446"
+  "root_hash": "421be66c9c25a759616ac934e4e5a1129cf8e8ca4615acbd92e07fb76e3d5bc2"
 }

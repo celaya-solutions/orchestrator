@@ -1,22 +1,38 @@
 {
   "run_id": "000",
   "objective": "Produce an inspection-ready Proof & Provenance Pack for this run under runs/000/evidence/.",
+  "status": "stopped_by_loop_detection",
   "timestamps": {
-    "started": "2026-01-05T10:10:10.709348",
-    "ended": "2026-01-05T10:10:14.805016"
+    "started": "2026-01-05T11:07:04.519591",
+    "ended": "2026-01-05T11:07:33.119594"
   },
   "git": {
-    "commit_hash": "e9b7ec4c89784f703569ddbc451bda4b5c937ed3"
+    "commit_hash": "94137a42bb050dbba0bb0194b1ffa70341d23a24"
   },
   "prompt": {
     "file": "PROMPT.md",
-    "policy_summary": "Non-negotiable: minimum 25 iterations, stop only when stability criteria met; work confined to ./workspace; no web/APIs; evidence quotes for claims; maintain contradictions and lenses; output signature per run.",
-    "active_context": "Lab is research-first/non-commercial; external frontier models require explicit justification; keep PII segregated and avoid exfiltration."
+    "objective": "Produce an inspection-ready Proof & Provenance Pack for this run under runs/000/evidence/.",
+    "system_policy": [
+      "Research-first, non-commercial lab context.",
+      "Frontier models allowed only with explicit justification and cost/benefit notes.",
+      "Findings stay internal unless marked publishable after review.",
+      "Do not exfiltrate private data; keep PII segregated."
+    ],
+    "inputs": {
+      "mindset_or_intervention": "{describe}",
+      "data_sources": "{list}",
+      "constraints": "No private data exfiltration; segregate PII."
+    }
   },
   "model": {
-    "selected_adapter": "acp (auto-selected)",
-    "model_id": "gemma3:1b (ollama default); Gemini CLI would be invoked via ACP but failed auth",
-    "provider": "acp via gemini-cli (auth failed before tool use)"
+    "selected_adapter": "ollama (auto-selected)",
+    "model_id": "gemma3:1b",
+    "other_adapters_initialized": [
+      "gemini",
+      "claude",
+      "acp"
+    ],
+    "notes": "No tool calls executed; final two iterations repeated `check_requirements.sh` outputs leading to safety loop stop."
   },
   "sampling_parameters": {
     "max_iterations": 100,
@@ -30,38 +46,58 @@
     "git_checkpoint": true
   },
   "metrics": {
-    "iterations": 1,
-    "successful": 0,
-    "failed": 1,
-    "success_rate": 0.0,
+    "iterations": 5,
+    "successful": 5,
+    "failed": 0,
+    "success_rate": 1.0,
     "cost_total_usd": 0.0,
-    "token_usage": {
-      "input": 0,
-      "output": 0
-    },
-    "iteration_details": [
+    "token_usage_total": 1224,
+    "iteration_summaries": [
       {
         "iteration": 1,
         "trigger_reason": "initial",
-        "duration_seconds": 4.095668077468872,
-        "success": false,
-        "error": "Iteration failed",
-        "timestamp": "2026-01-05T10:10:10.709348",
+        "timestamp": "2026-01-05T11:07:04.519591",
+        "tools_used": []
+      },
+      {
+        "iteration": 2,
+        "trigger_reason": "task_incomplete",
+        "timestamp": "2026-01-05T11:07:10.602115",
+        "tools_used": []
+      },
+      {
+        "iteration": 3,
+        "trigger_reason": "task_incomplete",
+        "timestamp": "2026-01-05T11:07:25.526518",
+        "tools_used": []
+      },
+      {
+        "iteration": 4,
+        "trigger_reason": "task_incomplete",
+        "timestamp": "2026-01-05T11:07:29.304977",
+        "tools_used": []
+      },
+      {
+        "iteration": 5,
+        "trigger_reason": "task_incomplete",
+        "timestamp": "2026-01-05T11:07:33.119594",
         "tools_used": []
       }
     ],
-    "source": "runs/000/evidence/ralph/metrics/metrics_20260105_101012.json"
+    "source": "runs/000/evidence/ralph/metrics/metrics_20260105_110733.json"
   },
-  "tool_usage_summary": "No tools invoked; ACP adapter aborted with authentication required before any tool call.",
+  "tool_usage_summary": "No tools were invoked. Agent output devolved into repeated `check_requirements.sh` snippets, triggering loop detection at iteration 5.",
   "artifacts": {
     "evidence_root": "runs/000/evidence",
-    "ralph_metrics": "runs/000/evidence/ralph/metrics/metrics_20260105_101012.json",
-    "ralph_log": "ralph.log",
-    "config": "ralph.yml"
+    "ralph_bundle": "runs/000/evidence/ralph",
+    "primary_metrics": "runs/000/evidence/ralph/metrics/metrics_20260105_110733.json",
+    "ralph_log": "ralph.log (last entry 2026-01-04; no entries for this run)",
+    "config": "ralph.yml",
+    "verify_script": "runs/000/verify.sh"
   },
   "notes": [
-    "ACP adapter terminated due to missing authentication; fallback disabled so run stopped after iteration 1.",
-    "Ralph orchestrator reported completion with an ignored asyncio BaseSubprocessTransport cleanup warning: RuntimeError: Event loop is closed.",
-    "Run halted after first iteration failure; no checkpoints were produced."
+    "Ralph orchestrator completed 5 iterations then stopped early due to safety loop detection on repeated output.",
+    "All iterations reported success with zero tool usage and zero reported cost.",
+    "Ollama adapter (gemma3:1b) was used; other adapters initialized but unused."
   ]
 }
