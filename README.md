@@ -8,6 +8,10 @@ Ralph Orchestrator implements a simple but effective pattern for autonomous task
 
 Based on the Ralph Wiggum technique by [Geoffrey Huntley](https://ghuntley.com/ralph/), this implementation provides a robust, tested, and feature-complete orchestration system for AI-driven development.
 
+### Governance / ISO-style run packaging
+
+If you need evidence-grade run packs (dossier, hashes, ledger, copied Ralph artifacts), see `ralph-iso.md` in the repo root. It describes how to treat one Ralph run as a self-contained “Proof & Provenance” package with verification, hashing, and ledger append steps.
+
 ## ✅ Production Ready - v1.2.0
 
 - **Ollama Integration**: ✅ COMPLETE (local-first, default `gemma3:1b`)
