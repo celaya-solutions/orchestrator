@@ -1,0 +1,8 @@
+{
+  "name": "Copy of CLOS: Ralph Orchestrator Visualizer",
+  "description": "Interactive simulation and visualization platform for the Ralph Wiggum continuous AI orchestration loop, featuring real-time pattern detection and metric tracking.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

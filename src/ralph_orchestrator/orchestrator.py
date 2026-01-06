@@ -22,7 +22,8 @@ from .metrics import Metrics, CostTracker, IterationStats, TriggerReason
 from .safety import SafetyGuard
 from .context import ContextManager
 from .output import RalphConsole
-from .main import RunType
+from .main import RunType, DEFAULT_METRICS_INTERVAL
+from .data_workspace import DataWorkspaceManager
 
 # Setup logging
 logging.basicConfig(
@@ -93,6 +94,7 @@ class RalphOrchestrator:
             self.iteration_telemetry = getattr(config, 'iteration_telemetry', True)
             self.output_preview_length = getattr(config, 'output_preview_length', 500)
             self.ollama_model = getattr(config, 'ollama_model', ollama_model)
+            self.metrics_interval = getattr(config, 'metrics_interval', DEFAULT_METRICS_INTERVAL)
         else:
             # Individual parameters
             self.prompt_file = Path(prompt_file_or_config if prompt_file_or_config else "PROMPT.md")
@@ -109,6 +111,7 @@ class RalphOrchestrator:
             self.iteration_telemetry = iteration_telemetry
             self.output_preview_length = output_preview_length
             self.ollama_model = ollama_model
+            self.metrics_interval = DEFAULT_METRICS_INTERVAL
 
         # Track requested vs resolved adapter names
         self.requested_tool = self.primary_tool
@@ -121,6 +124,10 @@ class RalphOrchestrator:
         self.cost_tracker = CostTracker() if track_costs else None
         self.safety_guard = SafetyGuard(max_iterations, max_runtime, max_cost)
         self.context_manager = ContextManager(self.prompt_file, prompt_text=self.prompt_text)
+        self.workspace_manager = DataWorkspaceManager(
+            data_root=Path("data"),
+            snapshot_interval=self.metrics_interval
+        )
         self.console = RalphConsole()  # Enhanced console output
         
         # Initialize adapters
@@ -510,12 +517,20 @@ class RalphOrchestrator:
     
     async def _aexecute_iteration(self) -> bool:
         """Execute a single iteration asynchronously."""
-        # Get the current prompt
-        prompt = self.context_manager.get_prompt()
+        checklist_status = self.workspace_manager.reconcile_todos(self.metrics.iterations)
+        target_path = self.workspace_manager.choose_target_path(checklist_status)
+
+        base_prompt = self.context_manager.get_prompt()
+        prompt = self.workspace_manager.compose_prompt(
+            base_prompt=base_prompt,
+            target_path=target_path,
+            checklist_status=checklist_status,
+            iteration=self.metrics.iterations,
+        )
         
         # Extract tasks from prompt if task queue is empty
         if not self.task_queue and not self.current_task:
-            self._extract_tasks_from_prompt(prompt)
+            self._extract_tasks_from_prompt(base_prompt)
         
         # Update current task status
         self._update_current_task('in_progress')
@@ -543,7 +558,6 @@ class RalphOrchestrator:
                 self.current_adapter.name,
                 error_msg
             )
-            return False
 
         if not response.success and self.allow_fallbacks and len(self.adapters) > 1 and not self.stop_requested:
             # Try fallback adapters (skip if shutdown requested) in priority order
@@ -601,6 +615,26 @@ class RalphOrchestrator:
             if any(word in output_lower for word in ['completed', 'finished', 'done', 'committed']):
                 self._update_current_task('completed')
         
+        # Record iteration logs under /data
+        resolved_target = target_path or (self.workspace_manager.docs_dir / "README.md")
+        self.workspace_manager.log_iteration(
+            iteration=self.metrics.iterations,
+            target_path=resolved_target,
+            mutation_type="write",
+            todo_count=checklist_status.todo_count if checklist_status else 0,
+            checklist_open_count=checklist_status.open_count if checklist_status else 0,
+            doc_consistency_score=0.0,
+            schema_coverage=0.0,
+            dataset_influence=0.0,
+            drift_metric=0.0,
+            entropy_delta=0.0,
+        )
+        self.workspace_manager.maybe_snapshot(
+            iteration=self.metrics.iterations,
+            metrics=self.metrics.to_dict(),
+            checklist_status=checklist_status,
+        )
+
         return response.success
     
     def _estimate_tokens(self, text: str) -> int:

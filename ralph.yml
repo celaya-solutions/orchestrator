@@ -13,7 +13,7 @@ ollama_model: gemma3:1b        # Default Ollama model to use
 # Resource limits
 max_tokens: 2000000           # Maximum total tokens (1M)
 max_cost: 5.0                 # Maximum cost in USD
-context_window: 400000        # Context window size in tokens
+context_window: 100000000     # Context window size in tokens
 context_threshold: 0.8        # Trigger summarization at 80% of context
 
 # Features

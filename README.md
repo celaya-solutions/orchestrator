@@ -184,6 +184,56 @@ ralph clean
 ralph run --dry-run
 ```
 
+## HealthKit preprocessing (streaming)
+
+- Install deps so the `aevon` module is on your path: `uv sync` or `python -m pip install -e .`
+- Run (repo checkout): `PYTHONPATH=src python -m aevon.preprocess_healthkit`
+- Run (after install): `python -m aevon.preprocess_healthkit` or `aevon-preprocess-healthkit`
+- Defaults: reads `/data/datasets/raw/healthkit/export.xml` (falls back to `data/datasets/raw/healthkit/export.xml`) and writes JSONL to `/data/datasets/derived/healthkit_timeseries.jsonl`
+- Metadata: `/data/datasets/derived/healthkit_metadata.json` includes `heart_rate_samples`, `skipped_records`, `windows_written`, and `source_hash`
+- Behavior: streaming `lxml.iterparse`, 5-minute windows, bounded memory; timeseries grows continuously on large exports
+
+## Voice transcript preprocessing
+
+- Run (repo checkout): `PYTHONPATH=src python -m aevon.preprocess_transcripts`
+- Outputs: `/data/datasets/derived/voice_timeseries.jsonl` and `/data/datasets/derived/voice_metadata.json`
+- Behavior: aligns transcript features to `healthkit_timeseries.jsonl` window boundaries, supports `.txt`, `.md`, `.json`, `.jsonl`, `.srt`, `.vtt`, and skips storing raw transcript text in derived outputs
+
+## Sentinel agent (Ollama, JSON-only)
+
+- Model: `gemma:2b` via Ollama (`ollama pull gemma:2b` once)
+- Contract input: `{"agent_name":"Sentinel","task":"...","context":{},"permissions":{}}` (stdin)
+- Run: `echo '{"agent_name":"Sentinel","task":"...", "context": {}, "permissions": {}}' | .venv/bin/sentinel-agent`
+- Output: strict JSON `{"agent":"Sentinel","decision":"...","confidence":0.0-1.0,"notes":"...","escalate":false}`
+- Deterministic, stateless between calls, rejects invalid/missing JSON.
+
+## Sovereign orchestrator (Governor)
+
+- Purpose: routes/schedules multiple agents, no domain reasoning, deterministic plans only.
+- Model: structural; default agent registry includes Sentinel (gemma:2b via Ollama).
+- Input schema (stdin): `{"request_id":"uuid","intent":"...","context":{},"available_agents":[{"name":"Sentinel","role":"generalist","permissions":{}}],"constraints":{}}`
+- Run: `echo '{"request_id":"1","intent":"...", "context": {}, "available_agents": [{"name": "Sentinel", "role": "generalist", "permissions": {}}], "constraints": {}}' | .venv/bin/sovereign-orchestrator`
+- Output schema: `{"request_id":"...","plan":[{"agent":"...","task":"...","priority":1,"expected_output":"..."}],"parallel":true,"merge_strategy":"compare","escalation_required":false,"notes":"..."}`
+- Logs: appends request, plan, agent responses, merge metadata; no agent-to-agent communication.
+
+## End-to-end preprocessing quickstart
+
+```bash
+# 1) Create and activate a venv (once)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+
+# 2) HealthKit windows
+.venv/bin/python -m aevon.preprocess_healthkit
+
+# 3) Voice transcripts aligned to the same windows
+.venv/bin/python -m aevon.preprocess_transcripts
+
+# Derived outputs land in /data/datasets/derived/
+ls data/datasets/derived
+```
+
 ### Advanced Options
 
 ```bash

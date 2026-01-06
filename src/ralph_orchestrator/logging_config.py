@@ -20,6 +20,8 @@ class RalphLogger:
     ADAPTER_CLAUDE = "ralph.adapter.claude"
     ADAPTER_GEMINI = "ralph.adapter.gemini"
     ADAPTER_OLLAMA = "ralph.adapter.ollama"
+    AGENT_SENTINEL = "ralph.agent.sentinel"
+    AGENT_OLLAMA = "ralph.agent.ollama"
     SAFETY = "ralph.safety"
     METRICS = "ralph.metrics"
     

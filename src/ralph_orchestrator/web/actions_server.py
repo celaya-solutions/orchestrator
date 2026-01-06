@@ -175,6 +175,40 @@ class ActionListResponse(BaseModel):
     runs: List[ActionRunStatus]
 
 
+class VisualizerIteration(BaseModel):
+    """Iteration payload for the visualizer."""
+
+    iteration: int = 0
+    timestamp: Optional[datetime] = None
+    tokens: int = 0
+    cost: float = 0.0
+    status: str = "retry"
+    message: str = ""
+
+
+class VisualizerSnapshot(BaseModel):
+    """Aggregated run snapshot for the visualizer UI."""
+
+    run_id: Optional[str] = None
+    status: str
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    current_iteration: int = 0
+    total_iterations: int = 0
+    total_tokens: int = 0
+    total_cost: float = 0.0
+    elapsed_seconds: int = 0
+    iterations: List[VisualizerIteration] = Field(default_factory=list)
+
+
+class VisualizerStartRequest(BaseModel):
+    """Simplified start payload for the visualizer."""
+
+    prompt_file: str = Field(default="PROMPT.md", description="Prompt file path to orchestrate")
+    agent: AgentType = Field(default=AgentType.AUTO, description="Agent to run with")
+    max_iterations: Optional[int] = Field(default=None, ge=1, le=DEFAULT_MAX_ITERATIONS)
+
+
 @dataclass
 class ActionRunState:
     """Internal tracking for an orchestration run."""
@@ -600,6 +634,13 @@ class ActionRunManager:
             states = list(self.runs.values())
         return sorted(states, key=lambda s: s.started_at, reverse=True)
 
+    async def latest_run(self) -> Optional[ActionRunState]:
+        """Return the most recently started run if present."""
+        async with self._lock:
+            if not self.runs:
+                return None
+            return max(self.runs.values(), key=lambda s: s.started_at)
+
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 ACTION_API_KEY = os.getenv("RALPH_ACTIONS_API_KEY")
@@ -776,6 +817,202 @@ def create_app() -> FastAPI:
         """List all tracked runs (newest first)."""
         runs = await manager.list_runs()
         return ActionListResponse(runs=[state.to_status() for state in runs])
+
+    def _parse_timestamp(value: Any) -> Optional[datetime]:
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            try:
+                return datetime.fromisoformat(value)
+            except ValueError:
+                return None
+        return None
+
+    def _iterations_from_records(records: List[Dict[str, Any]]) -> tuple[List[VisualizerIteration], int, float]:
+        iterations: List[VisualizerIteration] = []
+        total_tokens = 0
+        total_cost = 0.0
+        for record in records:
+            tokens = int(record.get("tokens_used") or 0)
+            cost = float(record.get("cost") or 0.0)
+            total_tokens += tokens
+            total_cost += cost
+            iterations.append(
+                VisualizerIteration(
+                    iteration=int(record.get("iteration") or 0),
+                    timestamp=_parse_timestamp(record.get("timestamp")),
+                    tokens=tokens,
+                    cost=cost,
+                    status="success" if record.get("success") else "retry",
+                    message=record.get("output_preview") or record.get("error") or "",
+                )
+            )
+        return iterations, total_tokens, total_cost
+
+    def _elapsed_seconds(started_at: Optional[datetime], completed_at: Optional[datetime]) -> int:
+        if not started_at:
+            return 0
+        start_ts = started_at
+        end_ts = completed_at or datetime.now(start_ts.tzinfo or timezone.utc)
+        if start_ts.tzinfo and end_ts.tzinfo is None:
+            end_ts = end_ts.replace(tzinfo=start_ts.tzinfo)
+        if start_ts.tzinfo is None and end_ts.tzinfo:
+            start_ts = start_ts.replace(tzinfo=end_ts.tzinfo)
+        return int((end_ts - start_ts).total_seconds())
+
+    def _snapshot_from_state(state: ActionRunState) -> VisualizerSnapshot:
+        orchestrator = state.orchestrator
+        iteration_stats = getattr(orchestrator, "iteration_stats", None)
+        cost_tracker = getattr(orchestrator, "cost_tracker", None)
+        raw_iterations = getattr(iteration_stats, "iterations", []) if iteration_stats else []
+
+        iterations, total_tokens, total_cost = _iterations_from_records(raw_iterations)
+        if cost_tracker:
+            total_tokens = total_tokens or (
+                getattr(cost_tracker, "total_input_tokens", 0) + getattr(cost_tracker, "total_output_tokens", 0)
+            )
+            total_cost = total_cost or getattr(cost_tracker, "total_cost", 0.0)
+
+        started_at = getattr(iteration_stats, "start_time", None) or state.started_at
+        completed_at = state.completed_at
+        current_iteration = getattr(iteration_stats, "current_iteration", 0) if iteration_stats else 0
+        total_iterations = getattr(iteration_stats, "total", 0) if iteration_stats else len(iterations)
+        status = state.state.upper() if isinstance(state.state, str) else "UNKNOWN"
+
+        return VisualizerSnapshot(
+            run_id=state.run_id,
+            status=status,
+            started_at=started_at,
+            completed_at=completed_at,
+            current_iteration=current_iteration,
+            total_iterations=total_iterations,
+            total_tokens=total_tokens,
+            total_cost=total_cost,
+            elapsed_seconds=_elapsed_seconds(started_at, completed_at),
+            iterations=iterations,
+        )
+
+    def _latest_metrics_file(state: Optional[ActionRunState] = None) -> Optional[Path]:
+        candidate = getattr(getattr(state, "orchestrator", None), "last_metrics_file", None)
+        if candidate:
+            path = Path(candidate)
+            if path.exists():
+                return path
+        metrics_dir = Path(".agent") / "metrics"
+        if not metrics_dir.exists():
+            return None
+        files = sorted(metrics_dir.glob("metrics_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+        return files[0] if files else None
+
+    def _snapshot_from_metrics(path: Path) -> Optional[VisualizerSnapshot]:
+        try:
+            metrics_data = json.loads(path.read_text())
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning("Failed to read metrics file %s: %s", path, exc)
+            return None
+
+        iterations_raw = metrics_data.get("iterations", []) or []
+        summary = metrics_data.get("summary", {}) or {}
+        cost_data = metrics_data.get("cost", {}) or {}
+        iterations, total_tokens, total_cost = _iterations_from_records(iterations_raw)
+
+        tokens_from_cost = cost_data.get("tokens", {}) if isinstance(cost_data, dict) else {}
+        if not total_tokens and isinstance(tokens_from_cost, dict):
+            total_tokens = int(tokens_from_cost.get("input", 0) + tokens_from_cost.get("output", 0))
+        if not total_cost and isinstance(cost_data, dict):
+            total_cost = float(cost_data.get("total", 0.0) or 0.0)
+
+        started_at = _parse_timestamp(iterations_raw[0].get("timestamp")) if iterations_raw else None
+        completed_at = _parse_timestamp(iterations_raw[-1].get("timestamp")) if iterations_raw else None
+        current_iteration = iterations[-1].iteration if iterations else 0
+        total_iterations = int(summary.get("iterations") or current_iteration)
+
+        return VisualizerSnapshot(
+            run_id=None,
+            status="COMPLETED",
+            started_at=started_at,
+            completed_at=completed_at,
+            current_iteration=current_iteration,
+            total_iterations=total_iterations,
+            total_tokens=total_tokens,
+            total_cost=total_cost,
+            elapsed_seconds=_elapsed_seconds(started_at, completed_at),
+            iterations=iterations,
+        )
+
+    async def _build_visualizer_snapshot(run_id: Optional[str] = None) -> Optional[VisualizerSnapshot]:
+        state: Optional[ActionRunState] = None
+        if run_id:
+            try:
+                state = await manager.get_run(run_id)
+            except KeyError:
+                state = None
+        else:
+            state = await manager.latest_run()
+
+        if state:
+            return _snapshot_from_state(state)
+
+        metrics_path = _latest_metrics_file(state)
+        if metrics_path:
+            return _snapshot_from_metrics(metrics_path)
+        return None
+
+    @app.get(
+        "/visualizer/latest",
+        response_model=VisualizerSnapshot,
+        dependencies=[Depends(require_api_key)],
+        tags=["visualizer"],
+    )
+    async def latest_visualizer_snapshot():
+        """Return the newest available run snapshot for the visualizer UI."""
+        snapshot = await _build_visualizer_snapshot()
+        if not snapshot:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No run data available")
+        return snapshot
+
+    @app.get(
+        "/visualizer/runs/{run_id}",
+        response_model=VisualizerSnapshot,
+        dependencies=[Depends(require_api_key)],
+        tags=["visualizer"],
+    )
+    async def visualizer_snapshot(run_id: str):
+        """Return snapshot for a specific run ID if available."""
+        snapshot = await _build_visualizer_snapshot(run_id)
+        if not snapshot:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Run not found")
+        return snapshot
+
+    @app.post(
+        "/visualizer/start",
+        response_model=VisualizerSnapshot,
+        dependencies=[Depends(require_api_key)],
+        tags=["visualizer"],
+    )
+    async def start_visualizer_run(payload: VisualizerStartRequest):
+        """Start a new orchestration run with sane defaults for the visualizer."""
+        try:
+            request = ActionRunRequest(
+                classification=RunType.AI_ONLY,
+                prompt_file=payload.prompt_file,
+                pay=None,
+                pay_type=None,
+                compensation=[],
+                schedule=None,
+                human_indicators=[],
+                config=ConfigOverrides(
+                    agent=payload.agent,
+                    max_iterations=payload.max_iterations,
+                ),
+                metadata={"origin": "visualizer"},
+            )
+            state = await manager.start_run(request)
+            return _snapshot_from_state(state)
+        except RunValidationError as exc:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=exc.reason) from exc
+        except Exception as exc:  # pragma: no cover - defensive
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
     app.include_router(build_admin_router(telemetry_service, ADMIN_API_KEY))
 
